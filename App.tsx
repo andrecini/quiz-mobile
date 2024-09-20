@@ -1,20 +1,41 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { HomeScreen } from './src/screens/HomeScreen';
+import { AddThemeScreen } from './src/screens/AddThemeScreen';
+import { AddQuestionScreen } from './src/screens/AddQuestionScreen';
+import { PlayQuizScreen } from './src/screens/PlayQuizScreen';
+import { ResultScreen } from './src/screens/ResultScreen';
+import { createTables } from './src/database/Database';
+import { Question } from './src/utils/types/Question';
 
-export default function App() {
+export type RootStackParamList = {
+  HomeScreen: undefined;
+  AddThemeScreen: undefined;
+  AddQuestionScreen: undefined;
+  PlayQuizScreen: { themeId: number; questionCount: number };
+  ResultScreen: { userAnswers: number[]; questions: Question[] };
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+const App: React.FC = () => {
+  useEffect(() => {
+    // Inicializa as tabelas do banco de dados
+    createTables();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="HomeScreen">
+        <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ title: 'Quiz Home' }} />
+        <Stack.Screen name="AddThemeScreen" component={AddThemeScreen} options={{ title: 'Add Theme' }} />
+        <Stack.Screen name="AddQuestionScreen" component={AddQuestionScreen} options={{ title: 'Add Question' }} />
+        <Stack.Screen name="PlayQuizScreen" component={PlayQuizScreen} options={{ title: 'Play Quiz' }} />
+        <Stack.Screen name="ResultScreen" component={ResultScreen} options={{ title: 'Quiz Results' }} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
