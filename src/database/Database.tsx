@@ -32,31 +32,27 @@ export const createTables = async () => {
   `);
 };
 
-// Função genérica para executar consultas (execução de inserções, atualizações e exclusões)
 export const runQuery = async (query: string, params: any[] = []) => {
   const db = await openDatabase();
   const result = await db.runAsync(query, ...params);
   return result;
 };
 
-// Função para obter a primeira linha de um resultado (útil para SELECT que retorna apenas uma linha)
 export const getFirstRow = async (query: string, params: any[] = []) => {
   const db = await openDatabase();
   const row = await db.getFirstAsync(query, ...params);
   return row;
 };
 
-// Função para obter todas as linhas de um resultado (útil para SELECT que retorna várias linhas)
 export const getAllRows = async (query: string, params: any[] = []) => {
   const db = await openDatabase();
   const rows = await db.getAllAsync(query, ...params);
   return rows;
 };
 
-// Função para iterar sobre os resultados de uma consulta (SELECT) um por vez
 export const iterateRows = async (query: string, params: any[] = []) => {
   const db = await openDatabase();
   for await (const row of db.getEachAsync(query, ...params)) {
-    console.log(row); // Você pode processar as linhas conforme necessário
+    console.log(row);
   }
 };
