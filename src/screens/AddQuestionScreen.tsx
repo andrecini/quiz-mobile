@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Text, Modal, TouchableOpacity, FlatList } from 'react-native';
-import { dbExecute } from '../database/Database';
+import { getAllRows, runQuery } from '../database/Database'; // Importando funções corretas do Database
 import { styles } from '../styles/style';
 
 interface Theme {
@@ -19,29 +19,39 @@ export const AddQuestionScreen: React.FC = () => {
 
   useEffect(() => {
     const fetchThemes = async () => {
-      const result = await dbExecute('SELECT * FROM themes');
-      setThemes(result.rows._array);
+      try {
+        const result = await getAllRows('SELECT * FROM themes');
+        setThemes(result as Theme[]); // Fazendo o casting para Theme[]
+      } catch (error) {
+        setMessage('Error fetching themes');
+      }
     };
     fetchThemes();
   }, []);
 
   const saveQuestion = async () => {
     if (question && answers.every(a => a !== '') && selectedTheme) {
-      const themeId = selectedTheme.id;
-      const result = await dbExecute(
-        'INSERT INTO questions (themeId, question, correctAnswer) VALUES (?, ?, ?)',
-        [themeId, question, correctAnswer]
-      );
-      const questionId = result.insertId;
-      for (let i = 0; i < answers.length; i++) {
-        await dbExecute(
-          'INSERT INTO answers (questionId, answer, isCorrect) VALUES (?, ?, ?)',
-          [questionId, answers[i], i === correctAnswer ? 1 : 0]
+      try {
+        const themeId = selectedTheme.id;
+        const result = await runQuery(
+          'INSERT INTO questions (themeId, question, correctAnswer) VALUES (?, ?, ?)',
+          [themeId, question, correctAnswer]
         );
+        const questionId = result.lastInsertRowId; // Obtém o ID da pergunta inserida
+
+        for (let i = 0; i < answers.length; i++) {
+          await runQuery(
+            'INSERT INTO answers (questionId, answer, isCorrect) VALUES (?, ?, ?)',
+            [questionId, answers[i], i === correctAnswer ? 1 : 0]
+          );
+        }
+
+        setMessage('Question saved successfully!');
+        setQuestion('');
+        setAnswers(['', '', '', '']);
+      } catch (error) {
+        setMessage('Error saving question');
       }
-      setMessage('Question saved successfully!');
-      setQuestion('');
-      setAnswers(['', '', '', '']);
     } else {
       setMessage('Please fill out all fields');
     }

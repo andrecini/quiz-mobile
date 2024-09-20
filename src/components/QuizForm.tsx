@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, TextInput, Modal, TouchableOpacity, FlatList } from 'react-native';
-import { dbExecute } from '../../database/Database';
+import { getAllRows, getFirstRow } from '../database/Database'; // Usando as funções corretas do Database
 import { styles } from '../styles/style';
 
 interface Theme {
@@ -23,8 +23,12 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
 
   useEffect(() => {
     const fetchThemes = async () => {
-      const result = await dbExecute('SELECT * FROM themes');
-      setThemes(result.rows._array);
+      try {
+        const result = await getAllRows('SELECT * FROM themes');
+        setThemes(result as Theme[]); // Fazendo o casting para Theme[]
+      } catch (error) {
+        console.error('Error fetching themes', error);
+      }
     };
     fetchThemes();
   }, []);
@@ -32,11 +36,19 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
   const handleThemeSelect = async (theme: Theme) => {
     setSelectedTheme(theme);
     setModalVisible(false); // Fecha o modal após a seleção
-    const result = await dbExecute(
-      'SELECT COUNT(*) AS total FROM questions WHERE themeId = ?',
-      [theme.id]
-    );
-    setQuestionsAvailable(result.rows._array[0].total);
+
+    try {
+      // Cast explícito do resultado para o formato esperado
+      const result = await getFirstRow(
+        'SELECT COUNT(*) AS total FROM questions WHERE themeId = ?',
+        [theme.id]
+      );
+      
+      // Aqui estamos assumindo que o result tem a forma { total: number }
+      setQuestionsAvailable((result as { total: number }).total); // Cast para acessar a propriedade total
+    } catch (error) {
+      console.error('Error fetching question count', error);
+    }
   };
 
   const handlePlayQuiz = () => {

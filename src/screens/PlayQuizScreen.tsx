@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Button, Text } from 'react-native';
-import { dbExecute } from '../database/Database';
+import { getAllRows } from '../database/Database'; // Importando função correta
 import { styles } from '../styles/style';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -31,11 +31,15 @@ export const PlayQuizScreen: React.FC<PlayQuizScreenProps> = ({ route, navigatio
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      const result = await dbExecute(
-        'SELECT * FROM questions WHERE themeId = ? LIMIT ?',
-        [themeId, questionCount]
-      );
-      setQuestions(result.rows._array);
+      try {
+        const result = await getAllRows(
+          'SELECT * FROM questions WHERE themeId = ? LIMIT ?',
+          [themeId, questionCount]
+        );
+        setQuestions(result as Question[]); // Fazendo o casting para Question[]
+      } catch (error) {
+        console.error('Error fetching questions', error);
+      }
     };
     fetchQuestions();
   }, [themeId, questionCount]);

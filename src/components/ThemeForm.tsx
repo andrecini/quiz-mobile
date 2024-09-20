@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
-import { dbExecute } from '../../database/Database';
+import { runQuery } from '../database/Database'; // Importa a função correta para executar queries
 import { styles } from '../styles/style';
 
 export const ThemeForm: React.FC = () => {
@@ -14,10 +14,12 @@ export const ThemeForm: React.FC = () => {
     }
 
     try {
-      await dbExecute('INSERT INTO themes (name) VALUES (?)', [themeName]);
+      // Usa a função `runQuery` para salvar o tema no banco de dados
+      await runQuery('INSERT INTO themes (name) VALUES (?)', [themeName]);
       setMessage('Theme saved successfully!');
-      setThemeName('');
+      setThemeName(''); // Reseta o campo após o salvamento
     } catch (error) {
+      console.error('Error saving theme:', error);
       setMessage('Error saving theme');
     }
   };

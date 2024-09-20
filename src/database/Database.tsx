@@ -1,58 +1,62 @@
 import * as SQLite from 'expo-sqlite';
 
-// Abrindo o banco de dados
-const db = SQLite.openDatabase('quiz.db');
-
-// Função para criar as tabelas necessárias
-export const createTables = () => {
-  db.transaction(tx => {
-    tx.executeSql(`
-      CREATE TABLE IF NOT EXISTS themes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT
-      );
-    `);
-    tx.executeSql(`
-      CREATE TABLE IF NOT EXISTS questions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        themeId INTEGER,
-        question TEXT,
-        correctAnswer INTEGER,
-        FOREIGN KEY(themeId) REFERENCES themes(id)
-      );
-    `);
-    tx.executeSql(`
-      CREATE TABLE IF NOT EXISTS answers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        questionId INTEGER,
-        answer TEXT,
-        isCorrect INTEGER,
-        FOREIGN KEY(questionId) REFERENCES questions(id)
-      );
-    `);
-  });
+// Função para abrir o banco de dados de forma assíncrona
+export const openDatabase = async (dbName: string = 'quiz.db') => {
+  const db = await SQLite.openDatabaseAsync(dbName);
+  return db;
 };
 
-// Tipos para a função dbExecute
-type QueryParams = any[]; // Tipagem para os parâmetros da query
-type QueryResult = SQLite.SQLResultSet; // Tipagem para o resultado da query
+// Função para criar as tabelas necessárias de forma assíncrona
+export const createTables = async () => {
+  const db = await openDatabase();
+  await db.execAsync(`
+    PRAGMA journal_mode = WAL;
+    CREATE TABLE IF NOT EXISTS themes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT
+    );
+    CREATE TABLE IF NOT EXISTS questions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      themeId INTEGER,
+      question TEXT,
+      correctAnswer INTEGER,
+      FOREIGN KEY(themeId) REFERENCES themes(id)
+    );
+    CREATE TABLE IF NOT EXISTS answers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      questionId INTEGER,
+      answer TEXT,
+      isCorrect INTEGER,
+      FOREIGN KEY(questionId) REFERENCES questions(id)
+    );
+  `);
+};
 
-// Função genérica para executar queries
-export const dbExecute = (query: string, params: QueryParams = []): Promise<QueryResult> => {
-  return new Promise((resolve, reject) => {
-    db.transaction(tx => {
-      tx.executeSql(
-        query,
-        params,
-        (tx, results) => {
-          resolve(results);
-        },
-        (tx, error) => {
-          console.error('SQL Error: ', error);
-          reject(error);
-          return false;  // O retorno deve ser false para indicar que a execução não deve continuar
-        }
-      );
-    });
-  });
+// Função genérica para executar consultas (execução de inserções, atualizações e exclusões)
+export const runQuery = async (query: string, params: any[] = []) => {
+  const db = await openDatabase();
+  const result = await db.runAsync(query, ...params);
+  return result;
+};
+
+// Função para obter a primeira linha de um resultado (útil para SELECT que retorna apenas uma linha)
+export const getFirstRow = async (query: string, params: any[] = []) => {
+  const db = await openDatabase();
+  const row = await db.getFirstAsync(query, ...params);
+  return row;
+};
+
+// Função para obter todas as linhas de um resultado (útil para SELECT que retorna várias linhas)
+export const getAllRows = async (query: string, params: any[] = []) => {
+  const db = await openDatabase();
+  const rows = await db.getAllAsync(query, ...params);
+  return rows;
+};
+
+// Função para iterar sobre os resultados de uma consulta (SELECT) um por vez
+export const iterateRows = async (query: string, params: any[] = []) => {
+  const db = await openDatabase();
+  for await (const row of db.getEachAsync(query, ...params)) {
+    console.log(row); // Você pode processar as linhas conforme necessário
+  }
 };

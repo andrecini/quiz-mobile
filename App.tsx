@@ -6,9 +6,10 @@ import { AddThemeScreen } from './src/screens/AddThemeScreen';
 import { AddQuestionScreen } from './src/screens/AddQuestionScreen';
 import { PlayQuizScreen } from './src/screens/PlayQuizScreen';
 import { ResultScreen } from './src/screens/ResultScreen';
-import { createTables } from './src/database/Database';
-import { Question } from './src/utils/types/Question';
+import { createTables } from './src/database/Database'; // Função de inicialização do banco
+import { Question } from './src/utils/types/Question'; // Tipos que você está usando
 
+// Definindo as rotas e parâmetros de navegação
 export type RootStackParamList = {
   HomeScreen: undefined;
   AddThemeScreen: undefined;
@@ -17,13 +18,23 @@ export type RootStackParamList = {
   ResultScreen: { userAnswers: number[]; questions: Question[] };
 };
 
+// Criando o Stack Navigator
 const Stack = createStackNavigator<RootStackParamList>();
 
 const App: React.FC = () => {
+  // Função para inicializar as tabelas do banco de dados
   useEffect(() => {
-    // Inicializa as tabelas do banco de dados
-    createTables();
-  }, []);
+    const initializeDatabase = async () => {
+      try {
+        await createTables(); // Inicializando as tabelas
+        console.log('Database initialized successfully');
+      } catch (error) {
+        console.error('Error initializing the database:', error);
+      }
+    };
+
+    initializeDatabase();
+  }, []); // O array vazio garante que o useEffect execute apenas uma vez
 
   return (
     <NavigationContainer>
