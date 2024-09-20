@@ -14,7 +14,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <Button
-          title="Add Theme"
+          title="Themes"
           onPress={() => navigation.navigate('AddThemeScreen')}
         />
       </View>

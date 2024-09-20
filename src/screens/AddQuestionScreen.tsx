@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, Text, Modal, TouchableOpacity, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
+import { Box, VStack, Input, Button, Text, Modal, Icon, HStack, Center } from 'native-base';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getAllRows, runQuery } from '../database/Database'; // Importando funções corretas do Database
-import { styles } from '../styles/style';
 
 interface Theme {
   id: number;
@@ -30,7 +31,7 @@ export const AddQuestionScreen: React.FC = () => {
   }, []);
 
   const saveQuestion = async () => {
-    if (question && answers.every(a => a !== '') && selectedTheme) {
+    if (question && answers.every((a) => a !== '') && selectedTheme) {
       try {
         const themeId = selectedTheme.id;
         const result = await runQuery(
@@ -63,73 +64,83 @@ export const AddQuestionScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add a New Question</Text>
+    <Box p={4}>
+      <Center my={5}>
+        <Text fontSize="xl" bold>
+          Add a New Question
+        </Text>
+      </Center>
 
-      <Text>Select a Theme:</Text>
-      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.pickerButton}>
-        <Text>{selectedTheme ? selectedTheme.name : 'Choose a theme'}</Text>
-      </TouchableOpacity>
+      <VStack space={4}>
+        <Text>Select a Theme:</Text>
+        <Button onPress={() => setModalVisible(true)} leftIcon={<Icon as={Ionicons} name="ios-list" />}>
+          {selectedTheme ? selectedTheme.name : 'Choose a theme'}
+        </Button>
 
-      {/* Modal para selecionar o tema */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select a Theme</Text>
-            <FlatList
-              data={themes}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalItem}
-                  onPress={() => handleThemeSelect(item)}
-                >
-                  <Text>{item.name}</Text>
-                </TouchableOpacity>
-              )}
-            />
-            <Button title="Close" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
+        {/* Modal para selecionar o tema */}
+        <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
+          <Modal.Content maxWidth="400px">
+            <Modal.CloseButton />
+            <Modal.Header>Select a Theme</Modal.Header>
+            <Modal.Body>
+              <FlatList
+                data={themes}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <Button
+                    mb={2}
+                    variant="outline"
+                    onPress={() => handleThemeSelect(item)}
+                  >
+                    {item.name}
+                  </Button>
+                )}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onPress={() => setModalVisible(false)}>Close</Button>
+            </Modal.Footer>
+          </Modal.Content>
+        </Modal>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter the question"
-        value={question}
-        onChangeText={setQuestion}
-      />
-
-      {answers.map((ans, index) => (
-        <TextInput
-          key={index}
-          style={styles.input}
-          placeholder={`Answer ${index + 1}`}
-          value={ans}
-          onChangeText={(text) => {
-            const newAnswers = [...answers];
-            newAnswers[index] = text;
-            setAnswers(newAnswers);
-          }}
+        <Input
+          placeholder="Enter the question"
+          value={question}
+          onChangeText={setQuestion}
+          InputLeftElement={<Icon as={Ionicons} name="ios-help-circle-outline" size="md" ml={2} />}
         />
-      ))}
 
-      <Text>Select the correct answer (0-3):</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Correct Answer"
-        keyboardType="numeric"
-        value={correctAnswer.toString()}
-        onChangeText={(value) => setCorrectAnswer(parseInt(value))}
-      />
+        {answers.map((ans, index) => (
+          <Input
+            key={index}
+            placeholder={`Answer ${index + 1}`}
+            value={ans}
+            onChangeText={(text) => {
+              const newAnswers = [...answers];
+              newAnswers[index] = text;
+              setAnswers(newAnswers);
+            }}
+            InputLeftElement={<Icon as={Ionicons} name="ios-create-outline" size="md" ml={2} />}
+          />
+        ))}
 
-      <Button title="Save Question" onPress={saveQuestion} />
-      {message ? <Text>{message}</Text> : null}
-    </View>
+        <Text>Select the correct answer (0-3):</Text>
+        <Input
+          placeholder="Correct Answer"
+          keyboardType="numeric"
+          value={correctAnswer.toString()}
+          onChangeText={(value) => setCorrectAnswer(parseInt(value))}
+          InputLeftElement={<Icon as={Ionicons} name="ios-checkmark-circle-outline" size="md" ml={2} />}
+        />
+
+        <Button onPress={saveQuestion} leftIcon={<Icon as={Ionicons} name="ios-save" size="md" />}>
+          Save Question
+        </Button>
+
+        {message && (
+          <Text color={message.includes('Error') ? 'red.500' : 'green.500'}>{message}</Text>
+        )}
+      </VStack>
+    </Box>
   );
 };

@@ -1,40 +1,86 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text } from 'react-native';
-import { runQuery } from '../database/Database'; // Importa a função correta para executar queries
-import { styles } from '../styles/style';
+import React, { useState, useEffect } from "react";
+import { Box, VStack, Input, Button, Text, Icon, HStack } from "native-base";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { runQuery } from "../database/Database";
 
-export const ThemeForm: React.FC = () => {
-  const [themeName, setThemeName] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
+interface ThemeFormProps {
+  themeToEdit?: { id: number; name: string } | null;
+  onThemeAdded: () => void;
+}
+
+export const ThemeForm: React.FC<ThemeFormProps> = ({
+  themeToEdit,
+  onThemeAdded,
+}) => {
+  const [themeName, setThemeName] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+
+  useEffect(() => {
+    if (themeToEdit) {
+      setThemeName(themeToEdit.name);
+    } else {
+      setThemeName("");
+    }
+  }, [themeToEdit]);
 
   const handleSaveTheme = async () => {
     if (!themeName.trim()) {
-      setMessage('Theme name cannot be empty');
+      setMessage("Theme name cannot be empty");
       return;
     }
 
     try {
-      // Usa a função `runQuery` para salvar o tema no banco de dados
-      await runQuery('INSERT INTO themes (name) VALUES (?)', [themeName]);
-      setMessage('Theme saved successfully!');
-      setThemeName(''); // Reseta o campo após o salvamento
+      if (themeToEdit) {
+        await runQuery("UPDATE themes SET name = ? WHERE id = ?", [
+          themeName,
+          themeToEdit?.id,
+        ]);
+        setMessage("Theme updated successfully!");
+      } else {
+        await runQuery("INSERT INTO themes (name) VALUES (?)", [themeName]);
+        setMessage("Theme saved successfully!");
+      }
+
+      setThemeName("");
+      onThemeAdded();
     } catch (error) {
-      console.error('Error saving theme:', error);
-      setMessage('Error saving theme');
+      console.error("Error saving theme:", error);
+      setMessage("Error saving theme");
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Enter a new theme:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Theme name"
-        value={themeName}
-        onChangeText={setThemeName}
-      />
-      <Button title="Save Theme" onPress={handleSaveTheme} />
-      {message ? <Text style={styles.message}>{message}</Text> : null}
-    </View>
+    <Box p={4} borderRadius="lg" shadow={2} bg="white" maxW="400px">
+      <VStack space={4}>
+        <HStack alignItems="center" space={2}>
+          <Icon as={Ionicons} name="albums" size="md" color="black" />
+          <Text fontSize="lg" bold>
+            {themeToEdit ? "Edit Theme" : "Add a new Theme"}
+          </Text>
+        </HStack>
+
+        <Input
+          variant="outline"
+          placeholder="Theme name"
+          value={themeName}
+          onChangeText={setThemeName}
+        />
+
+        <Button
+          onPress={handleSaveTheme}
+          leftIcon={<Icon as={Ionicons} name="save-sharp" size="md" />}
+        >
+          <Text fontWeight={700} color='white'>
+            {themeToEdit ? "Update Theme" : "Save Theme"}
+          </Text>
+        </Button>
+
+        {message ? (
+          <Text color={message.includes("Error") ? "red.500" : "green.500"}>
+            {message}
+          </Text>
+        ) : null}
+      </VStack>
+    </Box>
   );
 };

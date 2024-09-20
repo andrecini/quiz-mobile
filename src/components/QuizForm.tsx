@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, TextInput, Modal, TouchableOpacity, FlatList } from 'react-native';
-import { getAllRows, getFirstRow } from '../database/Database'; // Usando as funções corretas do Database
-import { styles } from '../styles/style';
+import { FlatList } from 'react-native';
+import { Modal, Button, Text, Input, Box, VStack, Center, Pressable, HStack, Icon } from 'native-base';
+import { getAllRows, getFirstRow } from '../database/Database'; 
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface Theme {
   id: number;
@@ -25,7 +26,7 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
     const fetchThemes = async () => {
       try {
         const result = await getAllRows('SELECT * FROM themes');
-        setThemes(result as Theme[]); // Fazendo o casting para Theme[]
+        setThemes(result as Theme[]); 
       } catch (error) {
         console.error('Error fetching themes', error);
       }
@@ -35,17 +36,14 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
 
   const handleThemeSelect = async (theme: Theme) => {
     setSelectedTheme(theme);
-    setModalVisible(false); // Fecha o modal após a seleção
+    setModalVisible(false); 
 
     try {
-      // Cast explícito do resultado para o formato esperado
       const result = await getFirstRow(
         'SELECT COUNT(*) AS total FROM questions WHERE themeId = ?',
         [theme.id]
       );
-      
-      // Aqui estamos assumindo que o result tem a forma { total: number }
-      setQuestionsAvailable((result as { total: number }).total); // Cast para acessar a propriedade total
+      setQuestionsAvailable((result as { total: number }).total);
     } catch (error) {
       console.error('Error fetching question count', error);
     }
@@ -65,52 +63,60 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <Box flex={1} p={4} bg="white">
       <Text>Select a Theme:</Text>
 
-      {/* Trigger para abrir o modal */}
-      <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.pickerButton}>
-        <Text>{selectedTheme ? selectedTheme.name : 'Choose a theme'}</Text>
-      </TouchableOpacity>
+      <Pressable onPress={() => setModalVisible(true)}>
+        <Box
+          py={4}
+          px={3}
+          rounded="lg"
+          borderWidth={1}
+          borderColor="coolGray.300"
+          alignItems="center"
+        >
+          <Text>{selectedTheme ? selectedTheme.name : 'Choose a theme'}</Text>
+        </Box>
+      </Pressable>
 
-      {/* Modal para selecionar o tema */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select a Theme</Text>
+      <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
+        <Modal.Content>
+          <Modal.CloseButton />
+          <Modal.Header>Select a Theme</Modal.Header>
+          <Modal.Body>
             <FlatList
               data={themes}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.modalItem}
+                <Pressable
                   onPress={() => handleThemeSelect(item)}
+                  mb={3}
+                  bg="coolGray.100"
+                  py={3}
+                  px={5}
+                  rounded="lg"
                 >
                   <Text>{item.name}</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
             />
-            <Button title="Close" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
+          </Modal.Body>
+        </Modal.Content>
       </Modal>
 
-      <Text>Questions available: {questionsAvailable}</Text>
+      <Text mt={4}>Questions available: {questionsAvailable}</Text>
 
-      <TextInput
-        style={styles.input}
+      <Input
+        mt={4}
         placeholder="Enter number of questions"
         keyboardType="numeric"
         value={questionCount}
         onChangeText={setQuestionCount}
       />
 
-      <Button title="Start Quiz" onPress={handlePlayQuiz} />
-    </View>
+      <Button mt={4} onPress={handlePlayQuiz}>
+        Start Quiz
+      </Button>
+    </Box>
   );
 };
