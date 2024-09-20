@@ -1,3 +1,5 @@
+// AddQuestionScreen.tsx
+
 import React, { useState } from 'react';
 import { Box, VStack, Heading } from 'native-base';
 import { QuestionForm } from '../components/QuestionForm';
@@ -17,7 +19,6 @@ export const AddQuestionScreen: React.FC = () => {
 
   const handleQuestionAdded = () => {
     setRefreshList(!refreshList);
-    setQuestionToEdit(null); 
   };
 
   const handleEditQuestion = (question: Question) => {
@@ -28,12 +29,18 @@ export const AddQuestionScreen: React.FC = () => {
     <Box flex={1} safeArea>
       <VStack space={4} p={5}>
         <Heading>
-          Manage Questions
+          Gerenciar Perguntas
         </Heading>
 
-        <QuestionForm questionToEdit={questionToEdit} onQuestionAdded={handleQuestionAdded} />
+        <QuestionForm
+          questionToEdit={questionToEdit}
+          onQuestionAdded={handleQuestionAdded}
+        />
 
-        <QuestionList key={refreshList.toString()} onEdit={handleEditQuestion} />
+        <QuestionList
+          key={refreshList.toString()}
+          onEdit={handleEditQuestion}
+        />
       </VStack>
     </Box>
   );

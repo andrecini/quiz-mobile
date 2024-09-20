@@ -1,7 +1,7 @@
 // QuestionForm.tsx
 
 import React, { useState, useEffect } from 'react';
-import { Box, HStack, VStack, Input, Button, Text, Select, Icon, Center } from 'native-base';
+import { Box, HStack, VStack, Input, Button, Text, Select, Icon } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { runQuery, getAllRows } from '../database/Database'; 
 
@@ -11,6 +11,7 @@ interface QuestionFormProps {
 }
 
 export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQuestionAdded }) => {
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [questionText, setQuestionText] = useState<string>('');
   const [answers, setAnswers] = useState<string[]>(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState<number>(0);
@@ -19,23 +20,32 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
-    const fetchThemesAndInitialize = async () => {
+    const fetchThemes = async () => {
       try {
         const result = await getAllRows('SELECT * FROM themes');
         setThemes(result as { id: number; name: string }[]);
-
-        if (questionToEdit) {
-          setQuestionText(questionToEdit.question);
-          setAnswers(questionToEdit.answers);
-          setCorrectAnswer(questionToEdit.correctAnswer);
-          setSelectedTheme(questionToEdit.themeId);
-        }
       } catch (error) {
-        console.error('Error fetching themes', error);
+        console.error('Erro ao buscar temas', error);
       }
     };
 
-    fetchThemesAndInitialize();
+    fetchThemes();
+  }, []);
+
+  useEffect(() => {
+    if (questionToEdit) {
+      setIsEditing(true);
+      setQuestionText(questionToEdit.question);
+      setAnswers(questionToEdit.answers);
+      setCorrectAnswer(questionToEdit.correctAnswer);
+      setSelectedTheme(questionToEdit.themeId);
+    } else {
+      setIsEditing(false);
+      setQuestionText('');
+      setAnswers(['', '', '', '']);
+      setCorrectAnswer(0);
+      setSelectedTheme(undefined);
+    }
   }, [questionToEdit]);
 
   const handleSaveQuestion = async () => {
@@ -45,7 +55,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
     }
 
     try {
-      if (questionToEdit) {
+      if (isEditing && questionToEdit) {
         // Atualiza pergunta existente
         await runQuery('UPDATE questions SET question = ?, correctAnswer = ?, themeId = ? WHERE id = ?', [
           questionText,
@@ -85,38 +95,47 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
         setMessage('Pergunta salva com sucesso!');
       }
 
-      // Limpa os campos após salvar
+      // Limpa os campos após salvar e volta ao modo de adição
       setQuestionText('');
       setAnswers(['', '', '', '']);
-      setSelectedTheme(undefined); // Limpa o tema selecionado
+      setCorrectAnswer(0);
+      setSelectedTheme(undefined);
+      setIsEditing(false);
       onQuestionAdded();
     } catch (error) {
       setMessage('Erro ao salvar a pergunta - ' + error);
     }
   };
 
-  // Adiciona um log para visualizar o valor de selectedTheme
-  console.log("Selected Theme Value:", selectedTheme);
+  const handleCancel = () => {
+    // Limpa os campos e sai do modo de edição
+    setQuestionText('');
+    setAnswers(['', '', '', '']);
+    setCorrectAnswer(0);
+    setSelectedTheme(undefined);
+    setIsEditing(false);
+    setMessage('');
+  };
 
   return (
     <Box p={4} borderRadius="lg" shadow={2} bg="white">
       <VStack space={4}>
-        <HStack space={1}>
-        <Icon as={Ionicons} name="help-circle-sharp" size="lg" color="black" alignSelf='center' />
+        <HStack space={1} alignItems="center">
+          <Icon as={Ionicons} name="help-circle-sharp" size="lg" color="black" />
           <Text fontSize="lg" bold>
-            {questionToEdit ? 'Editar Pergunta' : 'Adicionar Nova Pergunta'}
+            {isEditing ? 'Editar Pergunta' : 'Adicionar Nova Pergunta'}
           </Text>
         </HStack>
 
         {/* Select para o tema */}
         <Select
-          selectedValue={selectedTheme !== undefined ? selectedTheme.toString() : ''} 
+          selectedValue={selectedTheme !== undefined ? selectedTheme.toString() : ''}
           minWidth="200"
           placeholder="Escolha um tema"
           onValueChange={(itemValue) => setSelectedTheme(parseInt(itemValue))}
           _selectedItem={{
             bg: 'teal.600',
-            _text: { color: 'white' }, // Texto do item selecionado em branco
+            _text: { color: 'white' },
             endIcon: <Icon as={Ionicons} name="checkmark-sharp" size="lg" color="white" />,
           }}
         >
@@ -136,7 +155,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
               name="help-circle"
               size="md"
               ml={2}
-              color="blue.500" // Ícone em azul
+              color="blue.500"
             />
           }
         />
@@ -158,7 +177,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
                 name={index === correctAnswer ? "checkmark-circle-sharp" : "close-circle-outline"}
                 size="md"
                 ml={2}
-                color={index === correctAnswer ? "green.700" : "red.700"} // Ícone verde ou vermelho
+                color={index === correctAnswer ? "green.700" : "red.700"}
               />
             }
           />
@@ -171,7 +190,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
           onValueChange={(value) => setCorrectAnswer(parseInt(value))}
           _selectedItem={{
             bg: 'teal.600',
-            _text: { color: 'white' }, // Texto do item selecionado em branco
+            _text: { color: 'white' },
             endIcon: <Icon as={Ionicons} name="checkmark-sharp" size="lg" color="white" />,
           }}
         >
@@ -180,13 +199,31 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
           ))}
         </Select>
 
-        {/* Botão para salvar a pergunta */}
-        <Button onPress={handleSaveQuestion} leftIcon={<Icon as={Ionicons} name="save" size="md" />}>
-          {questionToEdit ? 'Atualizar Pergunta' : 'Salvar Pergunta'}
-        </Button>
+        {/* Botões de ação */}
+        <HStack space={2}>
+          <Button flex={1} onPress={handleSaveQuestion} leftIcon={<Icon as={Ionicons} name="save" size="md" />}>
+            {isEditing ? 'Atualizar Pergunta' : 'Salvar Pergunta'}
+          </Button>
+
+          {isEditing && (
+            <Button
+              flex={1}
+              variant="outline"
+              colorScheme="secondary"
+              onPress={handleCancel}
+              leftIcon={<Icon as={Ionicons} name="close-circle" size="md" />}
+            >
+              <Text fontWeight={700} color="secondary.500">
+                Cancelar
+              </Text>
+            </Button>
+          )}
+        </HStack>
 
         {message && (
-          <Text color={message.includes('Erro') ? 'red.500' : 'green.500'}>{message}</Text>
+          <Text color={message.includes('Erro') ? 'red.500' : 'green.500'}>
+            {message}
+          </Text>
         )}
       </VStack>
     </Box>

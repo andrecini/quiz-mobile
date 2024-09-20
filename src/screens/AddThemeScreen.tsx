@@ -1,5 +1,7 @@
+// AddThemeScreen.tsx
+
 import React, { useState } from 'react';
-import { Box, Text, VStack, Heading } from 'native-base';
+import { Box, VStack, Heading } from 'native-base';
 import { ThemeForm } from '../components/ThemeForm';
 import { ThemeList } from '../components/ThemeList';
 
@@ -9,7 +11,7 @@ export const AddThemeScreen: React.FC = () => {
 
   const handleThemeAdded = () => {
     setRefreshList(!refreshList); // Alterna o estado para forçar a recarga da lista
-    setThemeToEdit(null); // Reseta o formulário após a adição/edição
+    // Não é mais necessário redefinir themeToEdit aqui
   };
 
   const handleEditTheme = (theme: { id: number; name: string }) => {
@@ -20,14 +22,20 @@ export const AddThemeScreen: React.FC = () => {
     <Box flex={1} p={5} safeArea>
       <VStack space={4}>
         <Heading>
-          Manage Themes
+          Gerenciar Temas
         </Heading>
 
         {/* Componente do formulário de tema */}
-        <ThemeForm themeToEdit={themeToEdit} onThemeAdded={handleThemeAdded} />
+        <ThemeForm
+          themeToEdit={themeToEdit}
+          onThemeAdded={handleThemeAdded}
+        />
 
         {/* Lista de temas */}
-        <ThemeList key={refreshList.toString()} onEdit={handleEditTheme} />
+        <ThemeList
+          key={refreshList.toString()}
+          onEdit={handleEditTheme}
+        />
       </VStack>
     </Box>
   );
