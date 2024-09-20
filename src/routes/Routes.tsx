@@ -36,7 +36,7 @@ export default function Routes() {
         <Stack.Screen
           name="AddQuestionScreen"
           component={AddQuestionScreen}
-          options={{ title: "Add Question" }}
+          options={{ title: "Questions" }}
         />
         <Stack.Screen
           name="PlayQuizScreen"

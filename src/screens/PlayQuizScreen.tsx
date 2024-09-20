@@ -4,7 +4,7 @@ import { getAllRows } from '../database/Database'; // Importando função corret
 import { styles } from '../styles/style';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App'; // Importe o tipo de navegação
+import { RootStackParamList } from '../routes/Routes'; // Importe o tipo de navegação
 
 // Defina os parâmetros da rota para PlayQuizScreen
 type PlayQuizScreenRouteProp = RouteProp<RootStackParamList, 'PlayQuizScreen'>;
