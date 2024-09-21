@@ -5,6 +5,7 @@ import { HomeScreen } from "../screens/HomeScreen";
 import { AddThemeScreen } from "../screens/AddThemeScreen";
 import { AddQuestionScreen } from "../screens/AddQuestionScreen";
 import { PlayQuizScreen } from "../screens/PlayQuizScreen";
+import { QuizGameScreen } from "../screens/QuizGameScreen"; 
 import { ResultScreen } from "../screens/ResultScreen";
 
 import { Question } from "../utils/types/Question"; // Tipos que você está usando
@@ -14,7 +15,8 @@ export type RootStackParamList = {
   AddThemeScreen: undefined;
   AddQuestionScreen: undefined;
   PlayQuizScreen: { themeId: number; questionCount: number };
-  ResultScreen: { userAnswers: number[]; questions: Question[] };
+  QuizGameScreen: { themeId: number; questionCount: number }; // Adicione a tela do Quiz
+  ResultScreen: { score: number };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -42,6 +44,11 @@ export default function Routes() {
           name="PlayQuizScreen"
           component={PlayQuizScreen}
           options={{ title: "Play Quiz" }}
+        />
+        <Stack.Screen
+          name="QuizGameScreen"
+          component={QuizGameScreen}
+          options={{ title: "Quiz Game" }}
         />
         <Stack.Screen
           name="ResultScreen"

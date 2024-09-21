@@ -1,65 +1,79 @@
 import React from 'react';
-import { View, Text, Button, ScrollView } from 'react-native';
-import { styles } from '../styles/style';
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../App'; // Importando o RootStackParamList para tipagem
+import { Box, VStack, Text, Button } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
+import { Dimensions } from 'react-native';
+import { PieChart } from 'react-native-chart-kit';
+import { StackNavigationProp } from '@react-navigation/stack'; // Importar a tipagem correta para navegação
+import { RootStackParamList } from '../routes/Routes'; // Ajuste o caminho conforme sua estrutura
+
+// Defina o tipo de navegação especificamente para ResultScreen
+type ResultScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ResultScreen'>;
 
 interface ResultScreenProps {
-  route: RouteProp<RootStackParamList, 'ResultScreen'>;
-  navigation: StackNavigationProp<RootStackParamList, 'ResultScreen'>;
-}
-
-interface Question {
-  id: number;
-  question: string;
-  correctAnswer: number;
-  answers: string[];
-}
-
-export const ResultScreen: React.FC<ResultScreenProps> = ({ route, navigation }) => {
-  const { userAnswers, questions } = route.params;
-
-  const calculateResults = () => {
-    let correctCount = 0;
-    userAnswers.forEach((answer, index) => {
-      if (answer === questions[index].correctAnswer) {
-        correctCount++;
-      }
-    });
-    return {
-      correctCount,
-      totalQuestions: questions.length,
-      percentage: ((correctCount / questions.length) * 100).toFixed(2),
+  route: {
+    params: {
+      score: number; // Porcentagem de acertos
     };
   };
+}
 
-  const results = calculateResults();
+export const ResultScreen: React.FC<ResultScreenProps> = ({ route }) => {
+  const { score } = route.params;
+
+  // Use o tipo correto de navegação
+  const navigation = useNavigation<ResultScreenNavigationProp>();
+
+  // Dados para o gráfico de donut
+  const chartData = [
+    {
+      name: 'Acertos',
+      score,
+      color: 'rgba(0, 128, 0, 1)', // Cor verde para acertos
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 15,
+    },
+    {
+      name: 'Erros',
+      score: 100 - score,
+      color: 'rgba(255, 0, 0, 1)', // Cor vermelha para erros
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 15,
+    },
+  ];
+
+  const screenWidth = Dimensions.get('window').width;
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Quiz Results</Text>
-      <Text style={styles.resultText}>
-        Correct Answers: {results.correctCount} / {results.totalQuestions}
-      </Text>
-      <Text style={styles.resultText}>Accuracy: {results.percentage}%</Text>
+    <Box p={4} borderRadius="lg" shadow={2} bg="white" flex={1} justifyContent="center">
+      <VStack space={4} alignItems="center">
+        <Text fontSize="2xl" bold>Resultado do Quiz</Text>
 
-      <Text style={styles.breakdownTitle}>Question Breakdown:</Text>
-      {questions.map((question, index) => (
-        <View key={index} style={styles.questionContainer}>
-          <Text style={styles.questionText}>{question.question}</Text>
-          <Text style={styles.answerText}>
-            Your Answer: {userAnswers[index] === question.correctAnswer ? 'Correct' : 'Wrong'}
-          </Text>
-          {userAnswers[index] !== question.correctAnswer && (
-            <Text style={styles.correctAnswerText}>
-              Correct Answer: {question.answers[question.correctAnswer]}
-            </Text>
-          )}
-        </View>
-      ))}
+        {/* Gráfico de donut para exibir a porcentagem de acertos */}
+        <PieChart
+          data={chartData}
+          width={screenWidth - 40} // Define a largura do gráfico
+          height={220}
+          chartConfig={{
+            backgroundColor: '#fff',
+            backgroundGradientFrom: '#fff',
+            backgroundGradientTo: '#fff',
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            strokeWidth: 2, // Tamanho do arco do gráfico
+          }}
+          accessor="score"
+          backgroundColor="transparent"
+          paddingLeft="15"
+          center={[0, 0]}
+          absolute // Exibe os valores como números absolutos no centro
+        />
 
-      <Button title="Play Again" onPress={() => navigation.navigate('HomeScreen')} />
-    </ScrollView>
+        <Text fontSize="lg">{`Você acertou ${score}% das perguntas!`}</Text>
+
+        {/* Botão para voltar à tela inicial */}
+        <Button onPress={() => navigation.navigate('HomeScreen')}>
+          Voltar para a Tela Inicial
+        </Button>
+      </VStack>
+    </Box>
   );
 };
