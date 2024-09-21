@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, VStack, Text, Button, Radio, Icon } from 'native-base';
+import { Box, VStack, Text, Button, Radio, Icon, HStack } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getAllRows } from '../database/Database';
 import { useNavigation } from '@react-navigation/native';
@@ -24,6 +24,7 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
   const [questions, setQuestions] = useState<{ id: number; question: string; correctAnswer: number; answers: string[] }[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [isConfirmed, setIsConfirmed] = useState<boolean>(false); // Controle de confirmação
   const [correctAnswersCount, setCorrectAnswersCount] = useState<number>(0);
 
   useEffect(() => {
@@ -53,19 +54,23 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
     fetchQuestions();
   }, [themeId, questionCount]);
 
+  const handleConfirmAnswer = () => {
+    setIsConfirmed(true);
+
+    if (selectedAnswer !== null && selectedAnswer === questions[currentQuestionIndex].correctAnswer) {
+      setCorrectAnswersCount((prev) => prev + 1);
+    }
+  };
+
   const handleNextQuestion = () => {
-    if (selectedAnswer !== null) {
-      if (selectedAnswer === questions[currentQuestionIndex].correctAnswer) {
-        setCorrectAnswersCount((prev) => prev + 1);
-      }
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
       setSelectedAnswer(null); // Reseta a seleção
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex((prev) => prev + 1); // Avança para a próxima pergunta
-      } else {
-        // Final do quiz - navega para a tela de resultados
-        const score = Math.round((correctAnswersCount / questions.length) * 100);
-        navigation.navigate('ResultScreen', { score }); // Passa a pontuação para a ResultScreen
-      }
+      setIsConfirmed(false); // Permite nova resposta na próxima pergunta
+    } else {
+      // Final do quiz - navega para a tela de resultados
+      const score = Math.round((correctAnswersCount / questions.length) * 100);
+      navigation.navigate('ResultScreen', { score }); // Passa a pontuação para a ResultScreen
     }
   };
 
@@ -86,20 +91,44 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
           name="quizRadioGroup"
           value={selectedAnswer !== null ? selectedAnswer.toString() : ''}
           onChange={(nextValue) => setSelectedAnswer(parseInt(nextValue))}
+          isDisabled={isConfirmed} // Desabilita após a confirmação
         >
-          {currentQuestion.answers.map((answer, index) => (
-            <Radio key={index} value={index.toString()} my={1}>
-              {answer}
-            </Radio>
-          ))}
+          {currentQuestion.answers.map((answer, index) => {
+            const isCorrect = index === currentQuestion.correctAnswer;
+            const isSelected = selectedAnswer === index;
+
+            let bgColor = 'white';
+            if (isConfirmed) {
+              bgColor = isCorrect ? 'green.200' : isSelected ? 'red.200' : 'white';
+            }
+
+            return (
+              <Radio key={index} value={index.toString()} my={1} _disabled={{ bg: bgColor }}>
+                <HStack space={2} alignItems="center">
+                  <Text>{answer}</Text>
+                  {isConfirmed && isSelected && (
+                    <Icon as={Ionicons} name={isCorrect ? 'checkmark-circle' : 'close-circle'} color={isCorrect ? 'green.500' : 'red.500'} />
+                  )}
+                </HStack>
+              </Radio>
+            );
+          })}
         </Radio.Group>
 
-        <Button
-          onPress={handleNextQuestion}
-          leftIcon={<Icon as={Ionicons} name={currentQuestionIndex < questions.length - 1 ? "arrow-forward" : "checkmark-circle"} size="md" />}
-        >
-          {currentQuestionIndex < questions.length - 1 ? 'Próxima Pergunta' : 'Finalizar Quiz'}
-        </Button>
+        {!isConfirmed ? (
+          <Button onPress={handleConfirmAnswer} leftIcon={<Icon as={Ionicons} name="checkmark-circle-outline" size="md" />}>
+            Confirmar Resposta
+          </Button>
+        ) : (
+          <Button
+            onPress={handleNextQuestion}
+            leftIcon={<Icon as={Ionicons} name={currentQuestionIndex < questions.length - 1 ? "arrow-forward" : "checkmark-circle"} size="md" />}
+          >
+            {currentQuestionIndex < questions.length - 1 ? 'Próxima Pergunta' : 'Finalizar Quiz'}
+          </Button>
+        )}
+
+        <Text>Pontuação atual: {correctAnswersCount}</Text>
       </VStack>
     </Box>
   );

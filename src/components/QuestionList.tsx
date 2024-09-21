@@ -12,7 +12,7 @@ interface Question {
   theme: string;
   correctAnswer: number;
   answers: string[];
-  themeId: number; // Certifique-se de incluir o themeId
+  themeId: number;
 }
 
 interface QuestionListProps {

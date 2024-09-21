@@ -1,5 +1,3 @@
-// QuestionForm.tsx
-
 import React, { useState, useEffect } from 'react';
 import { Box, HStack, VStack, Input, Button, Text, Select, Icon } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -22,8 +20,10 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
   useEffect(() => {
     const fetchThemes = async () => {
       try {
+        console.log("Fetching themes...");
         const result = await getAllRows('SELECT * FROM themes');
         setThemes(result as { id: number; name: string }[]);
+        console.log("Themes fetched:", result);
       } catch (error) {
         console.error('Erro ao buscar temas', error);
       }
@@ -56,7 +56,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
 
     try {
       if (isEditing && questionToEdit) {
-        // Atualiza pergunta existente
+        console.log('Updating existing question...');
         await runQuery('UPDATE questions SET question = ?, correctAnswer = ?, themeId = ? WHERE id = ?', [
           questionText,
           correctAnswer,
@@ -64,7 +64,6 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
           questionToEdit.id,
         ]);
 
-        // Deleta respostas antigas e insere as novas
         await runQuery('DELETE FROM answers WHERE questionId = ?', [questionToEdit.id]);
 
         for (let i = 0; i < answers.length; i++) {
@@ -77,12 +76,14 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
 
         setMessage('Pergunta atualizada com sucesso!');
       } else {
-        // Insere nova pergunta
+        console.log('Inserting new question...');
         const result = await runQuery(
           'INSERT INTO questions (themeId, question, correctAnswer) VALUES (?, ?, ?)',
           [selectedTheme, questionText, correctAnswer]
         );
         const questionId = result.lastInsertRowId;
+
+        console.log('Question inserted with ID:', questionId);
 
         for (let i = 0; i < answers.length; i++) {
           await runQuery('INSERT INTO answers (questionId, answer, isCorrect) VALUES (?, ?, ?)', [
@@ -103,6 +104,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
       setIsEditing(false);
       onQuestionAdded();
     } catch (error) {
+      console.error('Error during query execution:', error);
       setMessage('Erro ao salvar a pergunta - ' + error);
     }
   };
@@ -116,6 +118,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({ questionToEdit, onQu
     setIsEditing(false);
     setMessage('');
   };
+
+  console.log("Selected Theme:", selectedTheme);
 
   return (
     <Box p={4} borderRadius="lg" shadow={2} bg="white">
