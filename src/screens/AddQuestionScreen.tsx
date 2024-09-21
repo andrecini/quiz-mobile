@@ -1,7 +1,5 @@
-// AddQuestionScreen.tsx
-
 import React, { useState } from 'react';
-import { Box, VStack, Heading } from 'native-base';
+import { Box, VStack, Heading, ScrollView } from 'native-base'; // Importe ScrollView
 import { QuestionForm } from '../components/QuestionForm';
 import { QuestionList } from '../components/QuestionList';
 
@@ -27,21 +25,26 @@ export const AddQuestionScreen: React.FC = () => {
 
   return (
     <Box flex={1} safeArea>
-      <VStack space={4} p={5}>
-        <Heading>
-          Gerenciar Perguntas
-        </Heading>
+      {/* Envolva o conteúdo em um ScrollView para permitir o scroll */}
+      <ScrollView>
+        <VStack space={4} p={5}>
+          <Heading>
+            Gerenciar Perguntas
+          </Heading>
 
-        <QuestionForm
-          questionToEdit={questionToEdit}
-          onQuestionAdded={handleQuestionAdded}
-        />
+          {/* Formulário de perguntas */}
+          <QuestionForm
+            questionToEdit={questionToEdit}
+            onQuestionAdded={handleQuestionAdded}
+          />
 
-        <QuestionList
-          key={refreshList.toString()}
-          onEdit={handleEditQuestion}
-        />
-      </VStack>
+          {/* Lista de perguntas */}
+          <QuestionList
+            key={refreshList.toString()}
+            onEdit={handleEditQuestion}
+          />
+        </VStack>
+      </ScrollView>
     </Box>
   );
 };
