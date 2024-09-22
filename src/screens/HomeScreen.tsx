@@ -87,7 +87,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               width: '100%'
             },
           ]}
-          onPress={() => navigation.navigate("AddThemeScreen")}
+          onPress={() => navigation.navigate("AddQuestionScreen")}
         >
           <Ionicons
             name="help-circle"
@@ -131,7 +131,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               width: '100%'
             },
           ]}
-          onPress={() => navigation.navigate("AddThemeScreen")}
+          onPress={() => navigation.navigate("PlayQuizScreen")}
         >
           <Ionicons
             name="play"
