@@ -1,8 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList } from 'react-native';
-import { Box, Text, Button, HStack, VStack, Icon, Alert, Pressable } from 'native-base';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getAllRows, runQuery } from '../database/Database';
+import React, { useEffect, useState } from "react";
+import { FlatList } from "react-native";
+import {
+  Box,
+  Text,
+  Button,
+  HStack,
+  VStack,
+  Icon,
+  Alert,
+  Pressable,
+} from "native-base";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { getAllRows, runQuery } from "../database/Database";
+import { Theme } from "../styles/Theme";
 
 interface ThemeListProps {
   onEdit: (theme: { id: number; name: string }) => void;
@@ -10,15 +20,14 @@ interface ThemeListProps {
 
 export const ThemeList: React.FC<ThemeListProps> = ({ onEdit }) => {
   const [themes, setThemes] = useState<{ id: number; name: string }[]>([]);
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
 
   const fetchThemes = async () => {
     try {
-      const result = await getAllRows('SELECT * FROM themes');
+      const result = await getAllRows("SELECT * FROM themes");
       setThemes(result as { id: number; name: string }[]);
     } catch (error) {
-      console.error('Error fetching themes:', error);
-      setMessage('Error fetching themes');
+      setMessage("Error fetching themes");
     }
   };
 
@@ -28,11 +37,10 @@ export const ThemeList: React.FC<ThemeListProps> = ({ onEdit }) => {
 
   const handleDeleteTheme = async (id: number) => {
     try {
-      await runQuery('DELETE FROM themes WHERE id = ?', [id]);
-      fetchThemes(); // Atualiza a lista de temas após a exclusão
+      await runQuery("DELETE FROM themes WHERE id = ?", [id]);
+      fetchThemes();
     } catch (error) {
-      console.error('Error deleting theme:', error);
-      setMessage('Error deleting theme');
+      setMessage("Error deleting theme");
     }
   };
 
@@ -40,38 +48,42 @@ export const ThemeList: React.FC<ThemeListProps> = ({ onEdit }) => {
     <Pressable>
       <Box
         p={4}
-        bg="coolGray.100"
+        bg={Theme.colors.secondary}
         borderRadius="lg"
         shadow={3}
         mb={3}
-        borderColor="coolGray.300"
+        borderColor={Theme.colors.border}
+        bgColor={Theme.colors.card}
         borderWidth={1}
-        _dark={{ borderColor: 'gray.600' }}
       >
         <HStack justifyContent="space-between" alignItems="center">
-          <Text fontSize="md" fontWeight="700">
+          <Text
+            fontSize={Theme.fontSizes.md}
+            fontWeight="700"
+            color={Theme.colors.textPrimary}
+          >
             {item.name}
           </Text>
           <HStack space={3}>
             <Button
               size="sm"
               variant="solid"
-              colorScheme="info"
+              bg={Theme.colors.primary}
               leftIcon={<Icon as={Ionicons} name="pencil" size="sm" />}
               onPress={() => onEdit(item)}
-              _text={{ fontWeight: '700' }}
+              _text={{ fontWeight: "700", color: Theme.colors.textPrimary }}
             >
-              Edit
+              Editar
             </Button>
             <Button
               size="sm"
               variant="solid"
-              colorScheme="danger"
+              bg={Theme.colors.error}
               leftIcon={<Icon as={Ionicons} name="trash" size="sm" />}
               onPress={() => handleDeleteTheme(item.id)}
-              _text={{ color: 'white', fontWeight: '700' }}
+              _text={{ fontWeight: "700", color: Theme.colors.textPrimary }}
             >
-              Delete
+              Deletar
             </Button>
           </HStack>
         </HStack>
@@ -83,7 +95,7 @@ export const ThemeList: React.FC<ThemeListProps> = ({ onEdit }) => {
     <VStack space={4} py={4}>
       {message && (
         <Alert w="100%" status="error">
-          <Text color="error.600">{message}</Text>
+          <Text color={Theme.colors.error}>{message}</Text>
         </Alert>
       )}
       <FlatList

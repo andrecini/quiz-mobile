@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Box, VStack, Heading, ScrollView } from 'native-base'; // Importe ScrollView
+import { Box, VStack, Heading, ScrollView } from 'native-base';
 import { QuestionForm } from '../components/QuestionForm';
 import { QuestionList } from '../components/QuestionList';
+import { Theme } from '../styles/Theme';
 
 interface Question {
   id: number;
@@ -24,21 +25,18 @@ export const AddQuestionScreen: React.FC = () => {
   };
 
   return (
-    <Box flex={1} safeArea>
-      {/* Envolva o conteúdo em um ScrollView para permitir o scroll */}
+    <Box flex={1} safeArea bg={Theme.colors.background}>
       <ScrollView>
         <VStack space={4} p={5}>
-          <Heading>
+          <Heading color={Theme.colors.textPrimary}>
             Gerenciar Perguntas
           </Heading>
 
-          {/* Formulário de perguntas */}
           <QuestionForm
             questionToEdit={questionToEdit}
             onQuestionAdded={handleQuestionAdded}
           />
 
-          {/* Lista de perguntas */}
           <QuestionList
             key={refreshList.toString()}
             onEdit={handleEditQuestion}

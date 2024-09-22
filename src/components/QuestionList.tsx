@@ -1,10 +1,19 @@
-// QuestionList.tsx
-
-import React, { useEffect, useState } from 'react';
-import { FlatList } from 'react-native';
-import { Box, Text, Button, HStack, VStack, Icon, Alert, Badge, Pressable } from 'native-base';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getAllRows, runQuery } from '../database/Database';
+import React, { useEffect, useState } from "react";
+import { FlatList } from "react-native";
+import {
+  Box,
+  Text,
+  Button,
+  HStack,
+  VStack,
+  Icon,
+  Alert,
+  Badge,
+  Pressable,
+} from "native-base";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { getAllRows, runQuery } from "../database/Database";
+import { Theme } from "../styles/Theme";
 
 interface Question {
   id: number;
@@ -21,7 +30,7 @@ interface QuestionListProps {
 
 export const QuestionList: React.FC<QuestionListProps> = ({ onEdit }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
 
   const fetchQuestions = async () => {
     try {
@@ -39,14 +48,13 @@ export const QuestionList: React.FC<QuestionListProps> = ({ onEdit }) => {
         question: row.question,
         correctAnswer: row.correctAnswer,
         theme: row.theme,
-        themeId: row.themeId, // Inclua o themeId aqui
-        answers: row.answers.split('|'), 
+        themeId: row.themeId,
+        answers: row.answers.split("|"),
       }));
 
       setQuestions(formattedQuestions);
     } catch (error) {
-      console.error('Error fetching questions', error);
-      setMessage('Erro ao buscar as perguntas');
+      setMessage("Erro ao buscar as perguntas");
     }
   };
 
@@ -56,11 +64,10 @@ export const QuestionList: React.FC<QuestionListProps> = ({ onEdit }) => {
 
   const handleDeleteQuestion = async (id: number) => {
     try {
-      await runQuery('DELETE FROM questions WHERE id = ?', [id]);
-      fetchQuestions(); 
+      await runQuery("DELETE FROM questions WHERE id = ?", [id]);
+      fetchQuestions();
     } catch (error) {
-      console.error('Error deleting question', error);
-      setMessage('Erro ao deletar a pergunta');
+      setMessage("Erro ao deletar a pergunta");
     }
   };
 
@@ -68,42 +75,57 @@ export const QuestionList: React.FC<QuestionListProps> = ({ onEdit }) => {
     <Pressable>
       <Box
         p={4}
-        bg="coolGray.100"
+        bg={Theme.colors.card}
         borderRadius="lg"
         shadow={3}
         mb={3}
-        borderColor="coolGray.300"
+        borderColor={Theme.colors.border}
         borderWidth={1}
-        _dark={{ borderColor: 'gray.600' }}
       >
-        <HStack justifyContent="space-between" alignItems="center" style={{gap: 5}}>
+        <HStack
+          justifyContent="space-between"
+          alignItems="center"
+          style={{ gap: 5 }}
+        >
           <VStack space={2} flex={1}>
-            <Badge colorScheme="teal" variant="solid" alignSelf="flex-start" mb={2}>
+            <Badge
+              colorScheme="teal"
+              variant="solid"
+              alignSelf="flex-start"
+              mb={2}
+            >
               {item.theme}
             </Badge>
 
-            <Text fontSize="md" fontWeight="700" isTruncated maxW="200" noOfLines={1}>
+            <Text
+              fontSize={Theme.fontSizes.md}
+              fontWeight="700"
+              isTruncated
+              maxW="200"
+              noOfLines={1}
+              color={Theme.colors.textPrimary}
+            >
               {item.question}
             </Text>
           </VStack>
-          <HStack space={3} alignSelf='flex-end'>
+          <HStack space={3} alignSelf="flex-end">
             <Button
               size="sm"
               variant="solid"
-              colorScheme="info"
+              bg={Theme.colors.primary}
               leftIcon={<Icon as={Ionicons} name="pencil" size="sm" />}
               onPress={() => onEdit(item)}
-              _text={{ fontWeight: '700' }}
+              _text={{ fontWeight: "700", color: Theme.colors.textPrimary }}
             >
               Editar
             </Button>
             <Button
               size="sm"
               variant="solid"
-              colorScheme="danger"
+              bg={Theme.colors.error}
               leftIcon={<Icon as={Ionicons} name="trash" size="sm" />}
               onPress={() => handleDeleteQuestion(item.id)}
-              _text={{ color: 'white', fontWeight: '700' }}
+              _text={{ color: Theme.colors.textPrimary, fontWeight: "700" }}
             >
               Deletar
             </Button>
@@ -117,7 +139,7 @@ export const QuestionList: React.FC<QuestionListProps> = ({ onEdit }) => {
     <VStack space={4} py={4}>
       {message && (
         <Alert w="100%" status="error">
-          <Text color="error.600">{message}</Text>
+          <Text color={Theme.colors.error}>{message}</Text>
         </Alert>
       )}
       <FlatList

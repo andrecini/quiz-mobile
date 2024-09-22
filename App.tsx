@@ -20,7 +20,7 @@ const App: React.FC = () => {
 
   return (
     <NativeBaseProvider theme={Theme}>  
-      <StatusBar backgroundColor={Theme.colors.blue[500]}/>
+      <StatusBar backgroundColor={Theme.colors.primary} barStyle="light-content" />
       <Routes />
     </NativeBaseProvider>
   );
