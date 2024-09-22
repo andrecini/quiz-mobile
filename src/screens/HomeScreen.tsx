@@ -5,10 +5,13 @@ import { NavigationProp } from "@react-navigation/native";
 import { Theme } from "../styles/Theme";
 import { styles } from "../styles/style"; // Garanta que o arquivo styles tenha os ajustes
 import { VStack } from "native-base";
+import { LogBox } from 'react-native';
 
 interface HomeScreenProps {
   navigation: NavigationProp<any>;
 }
+
+LogBox.ignoreLogs(['SSRProvider is not necessary']);
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
