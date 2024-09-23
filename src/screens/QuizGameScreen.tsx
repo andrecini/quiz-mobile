@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Box, VStack, Text, Button, Radio, Icon, HStack } from "native-base";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import { View, Box, VStack, Text, Button, Pressable } from "native-base";
 import { getAllRows } from "../database/Database";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -91,102 +90,45 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <View flex={1} bg={AppTheme.colors.background} p={4}>
-      <Box p={4} borderRadius="lg" shadow={2} bg={AppTheme.colors.background}>
-        <VStack space={4}>
-          <Text
-            fontSize={AppTheme.fontSizes.lg}
-            bold
-            color={AppTheme.colors.textPrimary}
-          >
-            {`Pergunta ${currentQuestionIndex + 1} de ${questions.length}`}
-          </Text>
+    <View flex={1} bg={AppTheme.colors.background} p={4} justifyContent="center">
+      <VStack space={4}>
+        <Text fontSize={AppTheme.fontSizes.md} color={AppTheme.colors.textPrimary}>
+          {currentQuestion.question}
+        </Text>
 
-          <Text
-            fontSize={AppTheme.fontSizes.md}
-            color={AppTheme.colors.textPrimary}
-          >
-            {currentQuestion.question}
-          </Text>
+        {currentQuestion.answers.map((answer, index) => {
+          const isSelected = selectedAnswer === index;
 
-          <Radio.Group
-            name="quizRadioGroup"
-            value={selectedAnswer !== null ? selectedAnswer.toString() : ""}
-            onChange={(nextValue) => setSelectedAnswer(parseInt(nextValue))}
-            isDisabled={isConfirmed}
-          >
-            {currentQuestion.answers.map((answer, index) => {
-              const isCorrect = index === currentQuestion.correctAnswer;
-              const isSelected = selectedAnswer === index;
-
-              let bgColor = AppTheme.colors.background;
-              if (isConfirmed) {
-                bgColor = isCorrect
-                  ? "green.200"
-                  : isSelected
-                  ? "red.200"
-                  : AppTheme.colors.background;
-              }
-
-              return (
-                <Radio
-                  key={index}
-                  value={index.toString()}
-                  my={1}
-                  _disabled={{ bg: bgColor }}
-                >
-                  <HStack space={2} alignItems="center">
-                    <Text color={AppTheme.colors.textPrimary}>{answer}</Text>
-                    {isConfirmed && isSelected && (
-                      <Icon
-                        as={Ionicons}
-                        name={isCorrect ? "checkmark-circle" : "close-circle"}
-                        color={isCorrect ? "green.500" : "red.500"}
-                      />
-                    )}
-                  </HStack>
-                </Radio>
-              );
-            })}
-          </Radio.Group>
-
-          {!isConfirmed ? (
-            <Button
-              onPress={handleConfirmAnswer}
-              leftIcon={
-                <Icon as={Ionicons} name="checkmark-circle-outline" size="md" />
-              }
-              bg={AppTheme.colors.primary}
+          return (
+            <Pressable
+              key={index}
+              onPress={() => !isConfirmed && setSelectedAnswer(index)}
+              bg={isSelected ? AppTheme.colors.primary : AppTheme.colors.backgroundLight}
+              borderRadius="md"
+              borderWidth={1}
+              borderColor={AppTheme.colors.border}
+              p={3}
+              mb={2}
             >
-              Confirmar Resposta
-            </Button>
-          ) : (
-            <Button
-              onPress={handleNextQuestion}
-              leftIcon={
-                <Icon
-                  as={Ionicons}
-                  name={
-                    currentQuestionIndex < questions.length - 1
-                      ? "arrow-forward"
-                      : "checkmark-circle"
-                  }
-                  size="md"
-                />
-              }
-              bg={AppTheme.colors.primary}
-            >
-              {currentQuestionIndex < questions.length - 1
-                ? "Próxima Pergunta"
-                : "Finalizar Quiz"}
-            </Button>
-          )}
+              <Text color={isSelected ? AppTheme.colors.textButton : AppTheme.colors.textPrimary}>
+                {answer}
+              </Text>
+            </Pressable>
+          );
+        })}
 
-          <Text color={AppTheme.colors.textSecondary}>
-            Pontuação atual: {correctAnswersCount}
-          </Text>
-        </VStack>
-      </Box>
+        {!isConfirmed ? (
+          <Button onPress={handleConfirmAnswer} bg={AppTheme.colors.success}>
+            Confirmar Resposta
+          </Button>
+        ) : (
+          <Button onPress={handleNextQuestion} bg={AppTheme.colors.primary}>
+            {currentQuestionIndex < questions.length - 1
+              ? "Próxima"
+              : "Finalizar"}
+          </Button>
+        )}
+      </VStack>
     </View>
   );
 };

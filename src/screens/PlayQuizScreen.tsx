@@ -6,10 +6,9 @@ import {
   Button,
   Text,
   Input,
-  Icon,
   View,
 } from "native-base";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import Feather from "react-native-vector-icons/Feather"; // Mudança para Feather Icons
 import { getAllRows } from "../database/Database";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -23,9 +22,7 @@ type PlayQuizScreenProp = StackNavigationProp<
 
 export const PlayQuizScreen: React.FC = () => {
   const [themes, setThemes] = useState<{ id: number; name: string }[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState<number | undefined>(
-    undefined
-  );
+  const [selectedTheme, setSelectedTheme] = useState<number | undefined>(undefined);
   const [questionsAvailable, setQuestionsAvailable] = useState<number>(0);
   const [numQuestions, setNumQuestions] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -59,22 +56,16 @@ export const PlayQuizScreen: React.FC = () => {
 
   const handleStartQuiz = () => {
     if (!selectedTheme || numQuestions.trim() === "") {
-      setErrorMessage(
-        "Por favor, selecione um tema e uma quantidade de perguntas."
-      );
+      setErrorMessage("Selecione um tema e uma quantidade válida de perguntas.");
       return;
     }
     const numQuestionsInt = parseInt(numQuestions);
     if (numQuestionsInt <= 0) {
-      setErrorMessage(
-        `Número de perguntas deve ser maior ou igual a 0. Selecione um valor entre 1 e ${questionsAvailable}.`
-      );
+      setErrorMessage(`Número de perguntas deve ser maior que 0. Tente entre 1 e ${questionsAvailable}.`);
       return;
     }
     if (numQuestionsInt > questionsAvailable) {
-      setErrorMessage(
-        `Número de perguntas excede o disponível. Existem apenas ${questionsAvailable} perguntas.`
-      );
+      setErrorMessage(`Só existem ${questionsAvailable} perguntas disponíveis.`);
       return;
     }
     setErrorMessage("");
@@ -86,35 +77,31 @@ export const PlayQuizScreen: React.FC = () => {
   };
 
   return (
-    <View flex={1} bg={AppTheme.colors.background} p={4}>
-      <Box p={4} borderRadius="lg" shadow={2} bg={AppTheme.colors.card}>
-        <VStack space={4}>
+    <View flex={1} bg={AppTheme.colors.backgroundLight} p={5} alignItems="center" justifyContent="center">
+        <VStack space={5} alignSelf="center">
           <Text
             fontSize={AppTheme.fontSizes.lg}
-            color={AppTheme.colors.textPrimary}
-            bold
+            color={AppTheme.colors.heading}
+            fontWeight="bold"
+            textAlign="center"
           >
-            Selecione um tema e quantidade de perguntas
+            Selecione o Tema e a Quantidade de Perguntas
           </Text>
 
           <Select
             selectedValue={selectedTheme ? selectedTheme.toString() : ""}
-            minWidth="200"
-            placeholder="Escolha um tema"
+            minWidth="220"
+            placeholder="Selecione um tema"
             onValueChange={handleThemeChange}
             _selectedItem={{
-              bg: AppTheme.colors.primary,
-              _text: { color: AppTheme.colors.textPrimary },
-              endIcon: (
-                <Icon
-                  as={Ionicons}
-                  name="checkmark-sharp"
-                  size="lg"
-                  color={AppTheme.colors.textPrimary}
-                />
-              ),
+              bg: AppTheme.colors.primaryLight,
+              endIcon: <Feather name="check-circle" size={18} color={AppTheme.colors.textButton} />
             }}
             color={AppTheme.colors.textPrimary}
+            bg={AppTheme.colors.card}
+            borderRadius="full"
+            borderWidth={1}
+            borderColor={AppTheme.colors.primary}
           >
             {themes.map((theme) => (
               <Select.Item
@@ -125,34 +112,33 @@ export const PlayQuizScreen: React.FC = () => {
             ))}
           </Select>
 
-          {selectedTheme && (
-            <Text color={AppTheme.colors.textSecondary}>
-              {`Este tema tem ${questionsAvailable} perguntas disponíveis.`}
-            </Text>
-          )}
 
           <Input
-            placeholder="Digite a quantidade de perguntas"
+            placeholder="Quantidade de perguntas"
             value={numQuestions}
             onChangeText={setNumQuestions}
             keyboardType="numeric"
             color={AppTheme.colors.textPrimary}
-            bg={AppTheme.colors.card}
+            bg={AppTheme.colors.background}
+            borderRadius="full"
+            borderWidth={1}
+            borderColor={AppTheme.colors.primary}
+            p={3}
+            placeholderTextColor={AppTheme.colors.textSecondary}
           />
-
-          {errorMessage && (
-            <Text color={AppTheme.colors.error}>{errorMessage}</Text>
-          )}
 
           <Button
             onPress={handleStartQuiz}
-            leftIcon={<Icon as={Ionicons} name="play" size="md" />}
             bg={AppTheme.colors.primary}
+            borderRadius="full"
+            _pressed={{ bg: AppTheme.colors.primaryLight }}
+            p={3}
           >
-            Iniciar Quiz
+            <Text color={AppTheme.colors.textButton} fontWeight="bold" fontSize="md">
+              Começar
+            </Text>
           </Button>
         </VStack>
-      </Box>
     </View>
   );
 };

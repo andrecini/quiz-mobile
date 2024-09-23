@@ -8,10 +8,9 @@ import {
   Box,
   VStack,
   Pressable,
-  Icon,
+  HStack,
 } from "native-base";
 import { getAllRows, getFirstRow } from "../database/Database";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { Theme as AppTheme } from "../styles/Theme";
 
 interface Theme {
@@ -40,7 +39,9 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
       try {
         const result = await getAllRows("SELECT * FROM themes");
         setThemes(result as Theme[]);
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     };
     fetchThemes();
   }, []);
@@ -55,7 +56,9 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
         [theme.id]
       );
       setQuestionsAvailable((result as { total: number }).total);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handlePlayQuiz = () => {
@@ -70,72 +73,90 @@ export const QuizForm: React.FC<QuizFormProps> = ({ navigation }) => {
         questionCount: questionCountNumber,
       });
     } else {
-      alert("Please select a valid theme and number of questions");
+      alert("Selecione um tema e uma quantidade válida de questões");
     }
   };
 
   return (
-    <Box flex={1} p={4} bg={AppTheme.colors.background}>
-      <Text color={AppTheme.colors.textPrimary}>Select a Theme:</Text>
-
-      <Pressable onPress={() => setModalVisible(true)}>
-        <Box
-          py={4}
-          px={3}
-          rounded="lg"
-          borderWidth={1}
-          borderColor={AppTheme.colors.border}
-          alignItems="center"
-          bg={AppTheme.colors.secondary}
+      <VStack space={5}>
+        <Text
+          color={AppTheme.colors.heading}
+          fontSize={AppTheme.fontSizes.xl}
+          bold
         >
-          <Text color={AppTheme.colors.textPrimary}>
-            {selectedTheme ? selectedTheme.name : "Choose a theme"}
-          </Text>
-        </Box>
-      </Pressable>
+          Escolha seu Tema
+        </Text>
 
-      <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
-        <Modal.Content>
-          <Modal.CloseButton />
-          <Modal.Header>Select a Theme</Modal.Header>
-          <Modal.Body>
-            <FlatList
-              data={themes}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <Pressable
-                  onPress={() => handleThemeSelect(item)}
-                  mb={3}
-                  bg={AppTheme.colors.secondary}
-                  py={3}
-                  px={5}
-                  rounded="lg"
-                >
-                  <Text color={AppTheme.colors.textPrimary}>{item.name}</Text>
-                </Pressable>
-              )}
-            />
-          </Modal.Body>
-        </Modal.Content>
-      </Modal>
+        <Pressable onPress={() => setModalVisible(true)}>
+            <HStack alignItems="center" justifyContent="center" w="full">
+              <Text
+                color={AppTheme.colors.textPrimary}
+                fontSize={AppTheme.fontSizes.md}
+                bold
+              >
+                {selectedTheme ? selectedTheme.name : "Selecione"}
+              </Text>
+            </HStack>
+        </Pressable>
 
-      <Text mt={4} color={AppTheme.colors.textPrimary}>
-        Questions available: {questionsAvailable}
-      </Text>
+        <Modal isOpen={modalVisible} onClose={() => setModalVisible(false)}>
+          <Modal.Content>
+            <Modal.CloseButton />
+            <Modal.Header>Escolha um Tema</Modal.Header>
+            <Modal.Body>
+              <FlatList
+                data={themes}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() => handleThemeSelect(item)}
+                    mb={3}
+                    bg={AppTheme.colors.background}
+                    py={4}
+                    px={5}
+                    rounded="md"
+                    borderColor={AppTheme.colors.border}
+                    borderWidth={1}
+                  >
+                    <Text color={AppTheme.colors.textPrimary} bold>
+                      {item.name}
+                    </Text>
+                  </Pressable>
+                )}
+              />
+            </Modal.Body>
+          </Modal.Content>
+        </Modal>
 
-      <Input
-        mt={4}
-        placeholder="Enter number of questions"
-        keyboardType="numeric"
-        value={questionCount}
-        onChangeText={setQuestionCount}
-        color={AppTheme.colors.textPrimary}
-        bg={AppTheme.colors.secondary}
-      />
+        <Text mt={4} color={AppTheme.colors.textSecondary} fontSize="lg">
+          Questões disponíveis: {questionsAvailable}
+        </Text>
 
-      <Button mt={4} onPress={handlePlayQuiz} bg={AppTheme.colors.primary}>
-        Start Quiz
-      </Button>
-    </Box>
+        <Input
+          mt={4}
+          placeholder="Quantidade de questões"
+          keyboardType="numeric"
+          value={questionCount}
+          onChangeText={setQuestionCount}
+          color={AppTheme.colors.textPrimary}
+          bg={AppTheme.colors.background}
+          borderColor={AppTheme.colors.border}
+          borderWidth={1}
+          rounded="md"
+          px={4}
+        />
+
+        <Button
+          mt={5}
+          onPress={handlePlayQuiz}
+          bg={AppTheme.colors.primary}
+          rounded="md"
+          py={3}
+          _text={{ fontSize: AppTheme.fontSizes.md, bold: true }}
+          _pressed={{ bg: AppTheme.colors.primaryLight }}
+        >
+          Começar Quiz
+        </Button>
+      </VStack>
   );
 };

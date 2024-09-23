@@ -10,7 +10,7 @@ import {
   Alert,
   Pressable,
 } from "native-base";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { getAllRows, runQuery } from "../database/Database";
 import { Theme } from "../styles/Theme";
 
@@ -27,7 +27,7 @@ export const ThemeList: React.FC<ThemeListProps> = ({ onEdit }) => {
       const result = await getAllRows("SELECT * FROM themes");
       setThemes(result as { id: number; name: string }[]);
     } catch (error) {
-      setMessage("Error fetching themes");
+      setMessage("Erro ao buscar os temas");
     }
   };
 
@@ -40,59 +40,51 @@ export const ThemeList: React.FC<ThemeListProps> = ({ onEdit }) => {
       await runQuery("DELETE FROM themes WHERE id = ?", [id]);
       fetchThemes();
     } catch (error) {
-      setMessage("Error deleting theme");
+      setMessage("Erro ao deletar o tema");
     }
   };
 
   const renderItem = ({ item }: { item: { id: number; name: string } }) => (
-    <Pressable>
-      <Box
-        p={4}
-        bg={Theme.colors.secondary}
-        borderRadius="lg"
-        shadow={3}
-        mb={3}
-        borderColor={Theme.colors.border}
-        bgColor={Theme.colors.card}
-        borderWidth={1}
-      >
+    <Pressable
+    paddingBottom={3}
+    borderBottomColor="blue.500"
+    borderBottomWidth={2}
+    marginBottom={3}
+    >
         <HStack justifyContent="space-between" alignItems="center">
           <Text
-            fontSize={Theme.fontSizes.md}
-            fontWeight="700"
+            fontSize={Theme.fontSizes.lg}
+            fontWeight="800"
             color={Theme.colors.textPrimary}
           >
             {item.name}
           </Text>
-          <HStack space={3}>
+          <HStack space={4}>
             <Button
               size="sm"
               variant="solid"
-              bg={Theme.colors.primary}
-              leftIcon={<Icon as={Ionicons} name="pencil" size="sm" />}
+              bg={Theme.colors.success}
+              leftIcon={<Icon as={MaterialIcons} name="edit" size="sm" />}
               onPress={() => onEdit(item)}
-              _text={{ fontWeight: "700", color: Theme.colors.textPrimary }}
+              _text={{ fontWeight: "bold", color: Theme.colors.textButton }}
             >
-              Editar
             </Button>
             <Button
               size="sm"
               variant="solid"
-              bg={Theme.colors.error}
-              leftIcon={<Icon as={Ionicons} name="trash" size="sm" />}
+              bg={Theme.colors.errorLight}
+              leftIcon={<Icon as={MaterialIcons} name="delete" size="sm" />}
               onPress={() => handleDeleteTheme(item.id)}
-              _text={{ fontWeight: "700", color: Theme.colors.textPrimary }}
+              _text={{ fontWeight: "bold", color: Theme.colors.textButton }}
             >
-              Deletar
             </Button>
           </HStack>
         </HStack>
-      </Box>
     </Pressable>
   );
 
   return (
-    <VStack space={4} py={4}>
+    <VStack space={5} py={5}>
       {message && (
         <Alert w="100%" status="error">
           <Text color={Theme.colors.error}>{message}</Text>

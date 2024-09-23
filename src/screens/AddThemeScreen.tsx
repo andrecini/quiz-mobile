@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, VStack, Heading } from 'native-base';
+import { Box, VStack, Heading, Divider, Text } from 'native-base';
 import { ThemeForm } from '../components/ThemeForm';
 import { ThemeList } from '../components/ThemeList';
 import { Theme } from '../styles/Theme';
@@ -17,11 +17,17 @@ export const AddThemeScreen: React.FC = () => {
   };
 
   return (
-    <Box flex={1} p={5} safeArea bg={Theme.colors.background}>
-      <VStack space={4}>
-        <Heading color={Theme.colors.textPrimary}>
-          Gerenciar Temas
+    <Box flex={1} p={6} safeArea bg={Theme.colors.background}>
+      <VStack space={6}>
+        <Heading color={Theme.colors.textPrimary} fontSize="3xl" textAlign="center" fontWeight="bold" mb={4}>
+          Configuração de Categorias
         </Heading>
+        
+        <Divider bg={Theme.colors.secondary} thickness="3" mb={6} />
+
+        <Text fontSize="lg" color={Theme.colors.textSecondary} textAlign="center">
+          Adicione, edite ou remova categorias para personalizar o quiz.
+        </Text>
 
         <ThemeForm
           themeToEdit={themeToEdit}

@@ -7,9 +7,7 @@ import {
   Button,
   Text,
   Select,
-  Icon,
 } from "native-base";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import { runQuery, getAllRows } from "../database/Database";
 import { Theme } from "../styles/Theme";
 
@@ -132,45 +130,31 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
   };
 
   return (
-    <Box p={4} borderRadius="lg" shadow={2} bg={Theme.colors.card}>
-      <VStack space={4}>
-        <HStack space={1} alignItems="center">
-          <Icon
-            as={Ionicons}
-            name="help-circle-sharp"
-            size="lg"
-            color={Theme.colors.iconColor}
-          />
-          <Text
-            fontSize={Theme.fontSizes.lg}
-            color={Theme.colors.textPrimary}
-            bold
-          >
-            {isEditing ? "Editar Pergunta" : "Adicionar Nova Pergunta"}
-          </Text>
-        </HStack>
+      <VStack space={5}>
+        <Text
+          fontSize={Theme.fontSizes.lg}
+          color={Theme.colors.textPrimary}
+          fontWeight="bold"
+          textAlign="center"
+          mb={4}
+        >
+          {isEditing ? "Atualizar" : "Criar"}
+        </Text>
 
         <Select
           selectedValue={
             selectedTheme !== undefined ? selectedTheme.toString() : ""
           }
-          minWidth="200"
-          placeholder="Escolha um tema"
+          minWidth="250"
+          placeholder="Escolha o Tema"
           onValueChange={(itemValue) => setSelectedTheme(parseInt(itemValue))}
-          _selectedItem={{
-            bg: Theme.colors.primary,
-            _text: { color: Theme.colors.textPrimary },
-            endIcon: (
-              <Icon
-                as={Ionicons}
-                name="checkmark-sharp"
-                size="lg"
-                color={Theme.colors.textPrimary}
-              />
-            ),
-          }}
-          bg={Theme.colors.card}
+          bg={Theme.colors.backgroundLight}
           color={Theme.colors.textPrimary}
+          borderWidth={2}
+          borderColor={Theme.colors.primary}
+          _selectedItem={{
+            bg: Theme.colors.successLight,
+          }}
         >
           {themes.map((theme) => (
             <Select.Item
@@ -185,17 +169,11 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           placeholder="Digite a pergunta"
           value={questionText}
           onChangeText={setQuestionText}
-          InputLeftElement={
-            <Icon
-              as={Ionicons}
-              name="help-circle"
-              size="md"
-              ml={2}
-              color={Theme.colors.primary}
-            />
-          }
           color={Theme.colors.textPrimary}
-          bg={Theme.colors.card}
+          bg={Theme.colors.backgroundLight}
+          borderColor={Theme.colors.primary}
+          borderWidth={2}
+          p={3}
         />
 
         {answers.map((ans, index) => (
@@ -208,46 +186,25 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               newAnswers[index] = text;
               setAnswers(newAnswers);
             }}
-            InputLeftElement={
-              <Icon
-                as={Ionicons}
-                name={
-                  index === correctAnswer
-                    ? "checkmark-circle-sharp"
-                    : "close-circle-outline"
-                }
-                size="md"
-                ml={2}
-                color={
-                  index === correctAnswer
-                    ? Theme.colors.success
-                    : Theme.colors.error
-                }
-              />
-            }
             color={Theme.colors.textPrimary}
-            bg={Theme.colors.card}
+            bg={Theme.colors.backgroundLight}
+            borderColor={Theme.colors.primary}
+            borderWidth={2}
+            p={3}
           />
         ))}
 
         <Select
           selectedValue={correctAnswer.toString()}
-          placeholder="Selecione a resposta correta"
+          placeholder="Escolha a Resposta Correta"
           onValueChange={(value) => setCorrectAnswer(parseInt(value))}
-          _selectedItem={{
-            bg: Theme.colors.primary,
-            _text: { color: Theme.colors.textPrimary },
-            endIcon: (
-              <Icon
-                as={Ionicons}
-                name="checkmark-sharp"
-                size="lg"
-                color={Theme.colors.textPrimary}
-              />
-            ),
-          }}
-          bg={Theme.colors.card}
+          bg={Theme.colors.backgroundLight}
           color={Theme.colors.textPrimary}
+          borderWidth={2}
+          borderColor={Theme.colors.primary}
+          _selectedItem={{
+            bg: Theme.colors.successLight,
+          }}
         >
           {answers.map((_, index) => (
             <Select.Item
@@ -258,25 +215,27 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           ))}
         </Select>
 
-        <HStack space={2}>
+        <HStack space={4} mt={4}>
           <Button
             flex={1}
             onPress={handleSaveQuestion}
-            leftIcon={<Icon as={Ionicons} name="save" size="md" />}
             bg={Theme.colors.primary}
+            borderRadius="full"
+            py={3}
           >
-            {isEditing ? "Atualizar Pergunta" : "Salvar Pergunta"}
+            {isEditing ? "Atualizar" : "Salvar"}
           </Button>
 
           {isEditing && (
             <Button
               flex={1}
               variant="outline"
-              colorScheme="secondary"
+              borderColor={Theme.colors.error}
               onPress={handleCancel}
-              leftIcon={<Icon as={Ionicons} name="close-circle" size="md" />}
+              borderRadius="full"
+              py={3}
             >
-              <Text fontWeight={700} color={Theme.colors.textSecondary}>
+              <Text fontWeight={700} color={Theme.colors.error}>
                 Cancelar
               </Text>
             </Button>
@@ -285,6 +244,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
 
         {message && (
           <Text
+            mt={4}
+            textAlign="center"
             color={
               message.includes("Erro")
                 ? Theme.colors.error
@@ -295,6 +256,5 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           </Text>
         )}
       </VStack>
-    </Box>
   );
 };

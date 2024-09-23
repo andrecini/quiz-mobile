@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, VStack, Input, Button, Text, Icon, HStack } from "native-base";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { runQuery } from "../database/Database";
 import { Theme } from "../styles/Theme";
 
@@ -60,48 +60,27 @@ export const ThemeForm: React.FC<ThemeFormProps> = ({
   };
 
   return (
-    <Box
-      p={4}
-      borderRadius="lg"
-      shadow={2}
-      bg={Theme.colors.card}
-      maxW="400px"
-    >
-      <VStack space={4}>
-        <HStack alignItems="center" space={2}>
-          <Icon
-            as={Ionicons}
-            name="albums"
-            size="md"
-            color={Theme.colors.iconColor}
-          />
-          <Text
-            fontSize={Theme.fontSizes.lg}
-            bold
-            color={Theme.colors.textPrimary}
-          >
-            {isEditing ? "Editar Tema" : "Adicionar Novo Tema"}
-          </Text>
-        </HStack>
+
+      <VStack space={5}>
 
         <Input
-          variant="outline"
-          placeholder="Nome do tema"
           value={themeName}
           onChangeText={setThemeName}
           color={Theme.colors.textPrimary}
-          bg={Theme.colors.card}
+          borderColor={Theme.colors.primary}
+          borderWidth={2}
+          py={3}
         />
 
-        <HStack space={2}>
+        <HStack space={3}>
           <Button
             flex={1}
             onPress={handleSaveTheme}
-            leftIcon={<Icon as={Ionicons} name="save-sharp" size="md" />}
             bg={Theme.colors.primary}
+            _pressed={{ bg: Theme.colors.primaryLight }}
           >
-            <Text fontWeight={700} color={Theme.colors.textPrimary}>
-              {isEditing ? "Atualizar Tema" : "Salvar Tema"}
+            <Text fontWeight={700} color={Theme.colors.textButton}>
+              {isEditing ? "Salvar Alterações" : "Adicionar Tema"}
             </Text>
           </Button>
 
@@ -110,28 +89,24 @@ export const ThemeForm: React.FC<ThemeFormProps> = ({
               flex={1}
               variant="outline"
               onPress={handleCancel}
-              leftIcon={<Icon as={Ionicons} name="close-circle" color={Theme.colors.textSecondary} size="md" />}
-              borderColor={Theme.colors.textSecondary}
+              borderColor={Theme.colors.error}
+              _text={{ color: Theme.colors.error }}
             >
-              <Text fontWeight={700} color={Theme.colors.textSecondary}>
-                Cancelar
-              </Text>
+              Cancelar
             </Button>
           )}
         </HStack>
 
         {message ? (
           <Text
+            fontWeight="bold"
             color={
-              message.includes("Erro")
-                ? Theme.colors.error
-                : Theme.colors.success
+              message.includes("Erro") ? Theme.colors.error : Theme.colors.success
             }
           >
             {message}
           </Text>
         ) : null}
       </VStack>
-    </Box>
   );
 };

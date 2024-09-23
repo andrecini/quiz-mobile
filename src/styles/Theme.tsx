@@ -2,27 +2,40 @@ import { extendTheme } from "native-base";
 
 export const Theme = extendTheme({
   colors: {
-    primary: "#820AD1", // Cor roxa
-    secondary: "#F3F4F6", // Cor cinza claro
-    background: "#000", // Cor de fundo escura
-    card: "#161616",
-    textPrimary: "#FFFFFF", // Cor branca para texto
-    textSecondary: "#CCCCCC", // Texto secundário em cinza claro
-    success: "#00C851", // Cor verde para sucesso
-    error: "#ff4444", // Cor vermelha para erro
-    iconColor: "#FFFFFF", // Cor dos ícones
-    border: "#333333", // Borda para inputs e botões
+    primary: "#3498db", // Azul claro vibrante
+    primaryLight: "#5dade2", // Azul ainda mais claro para botões
+    secondary: "#2c3e50", // Azul escuro para contraste
+    background: "#ecf0f1", // Fundo claro
+    backgroundLight: "#f9f9f9", // Cor de fundo mais clara
+    card: "#FFFFFF", // Cor de fundo para cards (adicionada)
+    heading: "#2980b9", // Azul escuro para headings
+    textPrimary: "#2c3e50", // Cor escura para textos
+    textSecondary: "#7f8c8d", // Cinza suave para textos secundários
+    success: "#27ae60", // Verde forte para sucesso
+    successLight: "#58d68d", // Verde claro para botões
+    error: "#c0392b", // Vermelho escuro para erro
+    errorLight: "#e74c3c", // Vermelho mais claro para botões
+    textButton: "#ffffff", // Branco para textos nos botões
+    iconColorDark: "#2c3e50", // Ícones mais escuros
+    border: "#dcdcdc", // Borda suave
   },
   fontSizes: {
     sm: 14,
     md: 16,
     lg: 20,
+    xl: 24, // Tamanho maior para destaques
   },
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
+    xs: 6, // Espaçamento um pouco maior para mais "respiro"
+    sm: 12,
+    md: 20,
+    lg: 28,
+    xl: 36,
+  },
+  radii: {
+    sm: 5,
+    md: 10,
+    lg: 15, // Cantos mais arredondados
+    xl: 20,
   },
 });

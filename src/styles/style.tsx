@@ -3,26 +3,28 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: 18,
+    backgroundColor: '#E8F0F2', // Fundo claro com toque azul
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 26,
+    fontWeight: '600', // Deixei o peso um pouco mais leve para diferenciação
+    marginBottom: 25,
+    color: '#2C3E50', // Azul escuro para os títulos
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
+    borderColor: '#BBBBBB', // Bordas em cinza claro
+    padding: 12,
+    marginVertical: 12,
+    borderRadius: 8, // Cantos mais arredondados para um visual moderno
+    backgroundColor: '#F7F9FB', // Fundo claro nos inputs
   },
   pickerButton: {
-    padding: 15,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    marginVertical: 10,
+    padding: 14,
+    backgroundColor: '#FF5733', // Laranja vibrante para botões
+    borderRadius: 10,
+    marginVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -30,69 +32,74 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(30,30,30,0.5)', // Sombra mais escura para modal
   },
   modalContent: {
-    width: '80%',
+    width: '85%',
     backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
+    padding: 24,
+    borderRadius: 16, // Bordas ainda mais arredondadas para modal
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
-    marginBottom: 20,
-    fontWeight: 'bold',
+    fontSize: 20,
+    marginBottom: 24,
+    fontWeight: '600',
+    color: '#2C3E50',
   },
   modalItem: {
-    padding: 15,
+    padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#DDDDDD', 
     width: '100%',
     alignItems: 'center',
   },
   buttonContainer: {
-    marginVertical: 10,
+    marginVertical: 12,
   },
   resultText: {
-    fontSize: 18,
-    marginVertical: 10,
+    fontSize: 20,
+    marginVertical: 12,
+    color: '#4E5D6C', // Cinza suave para os textos de resultados
   },
   breakdownTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginTop: 20,
+    marginTop: 24,
+    color: '#2C3E50',
   },
   questionContainer: {
-    marginVertical: 15,
-    padding: 15,
+    marginVertical: 16,
+    padding: 18,
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    backgroundColor: '#f9f9f9',
+    borderColor: '#BBBBBB',
+    borderRadius: 12,
+    backgroundColor: '#F7F9FB',
   },
   questionText: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#2C3E50',
   },
   answerText: {
     fontSize: 16,
-    color: 'blue',
-    marginVertical: 5,
+    color: '#3498db', // Azul para as respostas
+    marginVertical: 8,
   },
   correctAnswerText: {
     fontSize: 16,
-    color: 'green',
-    marginVertical: 5,
+    color: '#27ae60', // Verde para respostas corretas
+    marginVertical: 8,
   },
   message: {
     fontSize: 16,
-    color: 'red',
-    marginTop: 10,
+    color: '#EB5757', // Vermelho vibrante para mensagens de erro
+    marginTop: 12,
   },
   label: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 12,
+    color: '#2C3E50',
   },
 });
