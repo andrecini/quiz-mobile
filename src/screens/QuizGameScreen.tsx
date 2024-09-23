@@ -32,6 +32,8 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const [correctAnswersCount, setCorrectAnswersCount] = useState<number>(0);
+  const [incorrectAnswersCount, setIncorrectAnswersCount] = useState<number>(0);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -61,13 +63,18 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
   }, [themeId, questionCount]);
 
   const handleConfirmAnswer = () => {
+    if (selectedAnswer === null) {
+      setErrorMessage("Por favor, selecione uma resposta.");
+      return;
+    }
+    
     setIsConfirmed(true);
+    setErrorMessage(""); // Limpa a mensagem de erro
 
-    if (
-      selectedAnswer !== null &&
-      selectedAnswer === questions[currentQuestionIndex].correctAnswer
-    ) {
+    if (selectedAnswer === questions[currentQuestionIndex].correctAnswer) {
       setCorrectAnswersCount((prev) => prev + 1);
+    } else {
+      setIncorrectAnswersCount((prev) => prev + 1);
     }
   };
 
@@ -78,7 +85,7 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
       setIsConfirmed(false);
     } else {
       const score = Math.round((correctAnswersCount / questions.length) * 100);
-      navigation.navigate("ResultScreen", { score });
+      navigation.navigate("ResultScreen", { score, correctAnswersCount, incorrectAnswersCount });
     }
   };
 
@@ -112,43 +119,49 @@ export const QuizGameScreen: React.FC<QuizGameScreenProps> = ({ route }) => {
           <Radio.Group
             name="quizRadioGroup"
             value={selectedAnswer !== null ? selectedAnswer.toString() : ""}
-            onChange={(nextValue) => setSelectedAnswer(parseInt(nextValue))}
-            isDisabled={isConfirmed}
+            onChange={(nextValue) => !isConfirmed && setSelectedAnswer(parseInt(nextValue))}
+            isDisabled={isConfirmed} // Desabilita após a confirmação
           >
             {currentQuestion.answers.map((answer, index) => {
               const isCorrect = index === currentQuestion.correctAnswer;
               const isSelected = selectedAnswer === index;
-
-              let bgColor = AppTheme.colors.background;
-              if (isConfirmed) {
-                bgColor = isCorrect
-                  ? "green.200"
-                  : isSelected
-                  ? "red.200"
-                  : AppTheme.colors.background;
-              }
 
               return (
                 <Radio
                   key={index}
                   value={index.toString()}
                   my={1}
-                  _disabled={{ bg: bgColor }}
+                  isDisabled={isConfirmed} // Desabilita os botões individualmente após confirmação
                 >
                   <HStack space={2} alignItems="center">
                     <Text color={AppTheme.colors.textPrimary}>{answer}</Text>
-                    {isConfirmed && isSelected && (
-                      <Icon
-                        as={Ionicons}
-                        name={isCorrect ? "checkmark-circle" : "close-circle"}
-                        color={isCorrect ? "green.500" : "red.500"}
-                      />
+                    {isConfirmed && (
+                      <>
+                        {isSelected && !isCorrect && (
+                          <Icon
+                            as={Ionicons}
+                            name="close-circle"
+                            color="red.500"
+                          />
+                        )}
+                        {isCorrect && (
+                          <Icon
+                            as={Ionicons}
+                            name="checkmark-circle"
+                            color="green.500"
+                          />
+                        )}
+                      </>
                     )}
                   </HStack>
                 </Radio>
               );
             })}
           </Radio.Group>
+
+          {errorMessage ? (
+            <Text color={AppTheme.colors.error}>{errorMessage}</Text>
+          ) : null}
 
           {!isConfirmed ? (
             <Button

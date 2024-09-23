@@ -15,7 +15,7 @@ export type RootStackParamList = {
   AddQuestionScreen: undefined;
   PlayQuizScreen: { themeId: number; questionCount: number };
   QuizGameScreen: { themeId: number; questionCount: number }; 
-  ResultScreen: { score: number };
+  ResultScreen: { score: number; correctAnswersCount: number; incorrectAnswersCount: number};
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -27,9 +27,9 @@ export default function Routes() {
         initialRouteName="HomeScreen"
         screenOptions={{
           headerStyle: {
-            backgroundColor: Theme.colors.card, // Cor de fundo do header
+            backgroundColor: Theme.colors.card, 
           },
-          headerTintColor: '#fff', // Cor do texto do header
+          headerTintColor: '#fff', 
           headerTitleStyle: {
             fontWeight: 'bold',
           },

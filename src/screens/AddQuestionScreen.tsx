@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, VStack, Heading } from 'native-base';
+import { Box, VStack, Heading, FlatList } from 'native-base';
 import { QuestionForm } from '../components/QuestionForm';
 import { QuestionList } from '../components/QuestionList';
 import { Theme } from '../styles/Theme';
@@ -18,31 +18,41 @@ export const AddQuestionScreen: React.FC = () => {
 
   const handleQuestionAdded = () => {
     setRefreshList(!refreshList);
+    setQuestionToEdit(null);
   };
 
   const handleEditQuestion = (question: Question) => {
     setQuestionToEdit(question);
   };
 
+  const renderHeader = () => (
+    <VStack space={3} p={3}>
+      <Heading color={Theme.colors.textPrimary}>Gerenciar Perguntas</Heading>
+
+      <QuestionForm
+        questionToEdit={questionToEdit}
+        onQuestionAdded={handleQuestionAdded}
+      />
+    </VStack>
+  );
+
+  const renderFooter = () => (
+    <VStack space={2} p={3}>
+      <QuestionList
+        key={refreshList.toString()}
+        onEdit={handleEditQuestion}
+      />
+    </VStack>
+  );
+
   return (
-    <Box flex={1} safeArea bg={Theme.colors.background}>
-      <VStack space={4} p={5}>
-        <Heading color={Theme.colors.textPrimary}>
-          Gerenciar Perguntas
-        </Heading>
-
-        {}
-        <QuestionForm
-          questionToEdit={questionToEdit}
-          onQuestionAdded={handleQuestionAdded}
-        />
-
-        {}
-        <QuestionList
-          key={refreshList.toString()}
-          onEdit={handleEditQuestion}
-        />
-      </VStack>
-    </Box>
+    <FlatList
+      data={[]} 
+      keyExtractor={(item, index) => index.toString()} 
+      ListHeaderComponent={renderHeader}
+      ListFooterComponent={renderFooter}
+      renderItem={null} 
+      style={{ backgroundColor: Theme.colors.background }}
+    />
   );
 };

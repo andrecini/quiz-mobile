@@ -16,26 +16,28 @@ interface ResultScreenProps {
   route: {
     params: {
       score: number;
+      correctAnswersCount: number;
+      incorrectAnswersCount: number;
     };
   };
 }
 
 export const ResultScreen: React.FC<ResultScreenProps> = ({ route }) => {
-  const { score } = route.params;
+  const { score, correctAnswersCount, incorrectAnswersCount } = route.params;
   const navigation = useNavigation<ResultScreenNavigationProp>();
 
   const chartData = [
     {
       name: "Acertos",
-      score,
-      color: "rgba(0, 128, 0, 1)",
+      value: correctAnswersCount,
+      color: "#820AD1",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15,
     },
     {
       name: "Erros",
-      score: 100 - score,
-      color: "rgba(255, 0, 0, 1)",
+      value: incorrectAnswersCount,
+      color: "#F3F4F6",
       legendFontColor: "#7F7F7F",
       legendFontSize: 15,
     },
@@ -69,7 +71,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ route }) => {
               color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
               strokeWidth: 2,
             }}
-            accessor="score"
+            accessor="value"
             backgroundColor="transparent"
             paddingLeft="15"
             center={[0, 0]}
@@ -77,7 +79,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({ route }) => {
           />
 
           <Text fontSize="lg" color={AppTheme.colors.textPrimary}>
-            {`Você acertou ${score}% das perguntas!`}
+            {`Você acertou ${score}% das perguntas.`}
           </Text>
 
           <Button

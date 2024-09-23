@@ -57,13 +57,18 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
       setCorrectAnswer(questionToEdit.correctAnswer);
       setSelectedTheme(questionToEdit.themeId);
     } else {
-      setIsEditing(false);
-      setQuestionText("");
-      setAnswers(["", "", "", ""]);
-      setCorrectAnswer(0);
-      setSelectedTheme(undefined);
+      resetForm();
     }
   }, [questionToEdit]);
+
+  const resetForm = () => {
+    setIsEditing(false);
+    setQuestionText("");
+    setAnswers(["", "", "", ""]);
+    setCorrectAnswer(0);
+    setSelectedTheme(undefined);
+    setMessage("");
+  };
 
   const handleSaveQuestion = async () => {
     if (
@@ -93,6 +98,7 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           );
         }
 
+        resetForm();
         setMessage("Pergunta atualizada com sucesso!");
       } else {
         const result = await runQuery(
@@ -108,27 +114,14 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
           );
         }
 
+        resetForm();
         setMessage("Pergunta salva com sucesso!");
       }
 
-      setQuestionText("");
-      setAnswers(["", "", "", ""]);
-      setCorrectAnswer(0);
-      setSelectedTheme(undefined);
-      setIsEditing(false);
       onQuestionAdded();
     } catch (error) {
       setMessage("Erro ao salvar a pergunta - " + error);
     }
-  };
-
-  const handleCancel = () => {
-    setQuestionText("");
-    setAnswers(["", "", "", ""]);
-    setCorrectAnswer(0);
-    setSelectedTheme(undefined);
-    setIsEditing(false);
-    setMessage("");
   };
 
   return (
@@ -273,8 +266,8 @@ export const QuestionForm: React.FC<QuestionFormProps> = ({
               flex={1}
               variant="outline"
               colorScheme="secondary"
-              onPress={handleCancel}
-              leftIcon={<Icon as={Ionicons} name="close-circle" size="md" />}
+              onPress={resetForm}
+              leftIcon={<Icon as={Ionicons} name="close-circle" size="md" color='white'/>}
             >
               <Text fontWeight={700} color={Theme.colors.textSecondary}>
                 Cancelar
