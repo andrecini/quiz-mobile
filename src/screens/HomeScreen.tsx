@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons"; // Usando Ionicons para os ícone
 import { NavigationProp } from "@react-navigation/native";
 import { Theme } from "../styles/Theme";
 import { styles } from "../styles/style"; // Garanta que o arquivo styles tenha os ajustes
-import { VStack } from "native-base";
+import { VStack, Image } from "native-base";
 import { LogBox } from 'react-native';
 
 interface HomeScreenProps {
@@ -21,20 +21,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         { backgroundColor: Theme.colors.background, justifyContent: "flex-start" },
       ]}
     >
-      <Text
-        style={[
-          styles.title,
-          {
-            color: Theme.colors.textPrimary,
-            fontSize: 34,
-            fontWeight: "bold",
-            marginBottom: 40,
-            justifyContent: "center",
-          },
-        ]}
-      >
-        Bem vindo ao Quiz App
-      </Text>
+      <Image
+        source={require('../../assets/quizy.png')}
+        style={{ width: '80%', height: 200, resizeMode: 'contain', marginBottom: 10 }}
+        alignSelf='center'
+        alt="Logo"
+      />
 
       <Text
         style={[
